@@ -1,0 +1,17 @@
+exp: concat
+
+data:
+  rna_path: datasets/rna.csv
+  meth_path: datasets/meth.csv
+  clinical_path: datasets/clinical.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  test_size: 0.2
+  random_state: 42
+
+mofa:
+  factors: 20

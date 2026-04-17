@@ -1,0 +1,8 @@
+medical/
+datasets/
+logs/
+.conda_envs_dir_test
+*.log
+__pycache__/
+*.pyc
+*.pkl
