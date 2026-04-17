@@ -1,9 +1,9 @@
 exp: rna
 
 data:
-  rna_path: datasets/rna.csv
-  meth_path: datasets/meth.csv
-  clinical_path: datasets/clinical.csv
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
 
 preprocess:
   rna_top_var: 2000
