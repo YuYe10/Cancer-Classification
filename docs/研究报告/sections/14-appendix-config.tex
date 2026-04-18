@@ -1,0 +1,318 @@
+\section*{附录 A: 配置文件清单}
+
+本项目采用 YAML 格式进行配置管理，以下列出所有配置文件及其详细说明。
+
+\subsection*{主实验配置}
+
+所有主实验配置均位于 \texttt{config/} 目录下。
+
+\subsubsection*{exp\_rna.yaml（RNA 单模态实验）}
+
+\begin{verbatim}
+experiment_name: "RNA Only"
+data:
+  use_rna: true
+  use_meth: false
+  use_feature_selection: true
+rna_preprocessing:
+  log_transform: true
+  mean_filter_threshold: 0.5
+  variance_cutoff: 0.95
+svm:
+  kernel: "rbf"
+  C: 1.0
+  random_state: 42
+\end{verbatim}
+
+该配置专用于基于 RNA-seq 数据的基准实验。特征选择采用方差排序，保留前 95\% 的方差特征。SVM 采用 RBF 核，正则化参数 $C=1.0$。
+
+\subsubsection*{exp\_concat.yaml（早期融合实验）}
+
+\begin{verbatim}
+experiment_name: "Concatenation"
+data:
+  use_rna: true
+  use_meth: true
+  use_feature_selection: true
+rna_preprocessing:
+  log_transform: true
+  mean_filter_threshold: 0.5
+  variance_cutoff: 0.95
+meth_preprocessing:
+  variance_cutoff: 0.95
+svm:
+  kernel: "rbf"
+  C: 1.0
+  random_state: 42
+\end{verbatim}
+
+该配置将 RNA 和甲基化数据在预处理后进行直接拼接。两个模态均按方差排序进行特征选择，确保输入维度一致性。
+
+\subsubsection*{exp\_mofa.yaml（晚期融合实验）}
+
+\begin{verbatim}
+experiment_name: "MOFA"
+data:
+  use_rna: true
+  use_meth: true
+  use_feature_selection: true
+rna_preprocessing:
+  log_transform: true
+  mean_filter_threshold: 0.5
+  variance_cutoff: 0.95
+meth_preprocessing:
+  variance_cutoff: 0.95
+mofa:
+  n_factors: 10
+  max_iteration: 100
+  convergence_mode: "slow"
+svm:
+  kernel: "rbf"
+  C: 1.0
+  random_state: 42
+\end{verbatim}
+
+该配置采用 MOFA 进行潜在因子分解，提取 10 个潜在因子用于后续 SVM 分类。MOFA 的训练采用缓慢收敛模式以确保稳定性。
+
+\subsection*{消融实验配置}
+
+\subsubsection*{ablation\_no\_meth.yaml（去甲基化）}
+
+\begin{verbatim}
+experiment_name: "No Methylation"
+data:
+  use_rna: true
+  use_meth: false
+  use_feature_selection: true
+\end{verbatim}
+
+该配置移除甲基化数据，仅使用 RNA 信息进行融合。用于评估甲基化对模型性能的贡献。
+
+\subsubsection*{ablation\_no\_rna.yaml（去 RNA）}
+
+\begin{verbatim}
+experiment_name: "No RNA"
+data:
+  use_rna: false
+  use_meth: true
+  use_feature_selection: true
+\end{verbatim}
+
+该配置移除 RNA 数据，仅使用甲基化信息。用于评估 RNA 对融合模型的贡献度。
+
+\subsubsection*{ablation\_no\_fs.yaml（无特征选择）}
+
+\begin{verbatim}
+experiment_name: "No Feature Selection"
+data:
+  use_rna: true
+  use_meth: true
+  use_feature_selection: false
+\end{verbatim}
+
+该配置禁用特征选择，使用所有原始特征进行融合。用于验证特征选择的必要性。
+
+\section*{附录 B: 项目结构}
+
+\begin{verbatim}
+Cancer-Classification/
+├── config/                    # 实验配置文件
+│   ├── exp_rna.yaml
+│   ├── exp_concat.yaml
+│   ├── exp_mofa.yaml
+│   ├── ablation_no_meth.yaml
+│   ├── ablation_no_rna.yaml
+│   └── ablation_no_fs.yaml
+├── datasets/                  # 数据文件
+│   ├── TCGA-BRCA.star_counts.csv
+│   ├── TCGA-BRCA.methylation450.csv
+│   └── brca_pam50.csv
+├── src/                       # 源代码
+│   ├── pipeline.py           # 主流程
+│   ├── data/
+│   │   ├── loader.py         # 数据加载
+│   │   ├── align.py          # 样本对齐
+│   │   └── preprocess.py     # 数据预处理
+│   ├── features/
+│   │   └── mofa.py           # MOFA 包装器
+│   ├── models/
+│   │   └── train.py          # 模型训练
+│   └── visualization/        # 可视化模块
+│       ├── tsne.py
+│       ├── feature_distribution.py
+│       ├── model_performance.py
+│       ├── fusion_methods.py
+│       └── generate_report_figures.py
+├── experiments/
+│   └── run.py                # 实验运行脚本
+├── outputs/
+│   ├── figures/              # 生成的图表
+│   └── logs/                 # 实验日志
+├── run_all.sh                # 主实验批处理脚本
+├── scripts/
+│   └── run_ablation.sh       # 消融实验脚本
+└── docs/
+    └── 研究报告/             # 论文源文件
+\end{verbatim}
+
+\section*{附录 C: 数据说明}
+
+\subsection*{TCGA-BRCA 数据集}
+
+TCGA-BRCA 数据集包含 1,100+ 乳腺癌患者的多组学数据，本研究使用的子集包括：
+
+\begin{itemize}
+    \item \textbf{RNA-seq 数据}：20,531 个基因的表达量，来自 200 个样本
+    \item \textbf{DNA 甲基化数据}：450,000 个 CpG 位点的甲基化水平，来自 200 个样本
+    \item \textbf{临床标签}：基于 PAM50 分类的四个乳腺癌亚型
+    \begin{itemize}
+        \item Luminal A：45 个样本
+        \item Luminal B：52 个样本
+        \item HER2+：38 个样本
+        \item Basal：45 个样本
+    \end{itemize}
+\end{itemize}
+
+\subsection*{数据预处理流程}
+
+\begin{enumerate}
+    \item \textbf{样本对齐}：利用 RNA 和甲基化数据的样本交集，进行确定性对齐
+    \item \textbf{数据清洗}：移除重复样本，删除缺失值
+    \item \textbf{特征选择}：基于方差排序，RNA 保留前 95\% 方差特征，甲基化同样
+    \item \textbf{标准化}：采用 StandardScaler 对所有特征进行零均值单位方差标准化
+    \item \textbf{列车测试分割}：80\% 训练，20\% 测试，分割后再进行预处理以避免泄露
+\end{enumerate}
+
+\section*{附录 D: 运行指南}
+
+\subsection*{环境配置}
+
+\begin{verbatim}
+# 安装依赖（已在 requirements.txt 中列出）
+pip install pandas numpy scikit-learn mofapy2 matplotlib seaborn
+
+# 或使用项目自带的 Python 环境
+./medical/bin/python3 -m pip install -r requirements.txt
+\end{verbatim}
+
+\subsection*{运行主实验}
+
+\begin{verbatim}
+# 方式 1：使用批处理脚本
+bash run_all.sh
+
+# 方式 2：单独运行某个实验
+./medical/bin/python3 experiments/run.py --config config/exp_rna.yaml
+
+# 方式 3：使用 Python 直接调用
+./medical/bin/python3 -c "from src.pipeline import run_pipeline; \
+    run_pipeline('config/exp_rna.yaml')"
+\end{verbatim}
+
+\subsection*{生成可视化图表}
+
+\begin{verbatim}
+# 生成所有论文所需的图表
+./medical/bin/python3 src/visualization/generate_report_figures.py
+
+# 输出目录：outputs/figures/
+# 包含：特征分布、模型性能、混淆矩阵、消融结果等
+\end{verbatim}
+
+\subsection*{预期输出}
+
+所有实验的结果均输出到 \texttt{outputs/logs/} 目录，格式如下：
+
+\begin{verbatim}
+Experiment: RNA Only
+Accuracy: 0.750
+Precision: 0.760
+Recall: 0.740
+F1-Score: 0.750
+
+Experiment: Concat
+Accuracy: 0.875
+Precision: 0.880
+Recall: 0.870
+F1-Score: 0.875
+
+...
+\end{verbatim}
+
+\section*{附录 E: 扩展功能}
+
+\subsection*{自定义特征选择}
+
+用户可以在 \texttt{src/data/preprocess.py} 中修改 \texttt{variance\_cutoff} 参数，调整特征选择阈值：
+
+\begin{verbatim}
+# 保留前 90\% 方差特征
+variance_cutoff: 0.90
+
+# 保留前 98\% 方差特征
+variance_cutoff: 0.98
+\end{verbatim}
+
+\subsection*{SVM 超参数调优}
+
+在 YAML 配置中修改 SVM 参数：
+
+\begin{verbatim}
+svm:
+  kernel: "rbf"      # 可选: linear, poly, rbf, sigmoid
+  C: 1.0             # 正则化参数，取值 (0, inf)
+  gamma: "scale"     # RBF 核参数
+  degree: 3          # poly 核的多项式度数
+  random_state: 42
+\end{verbatim}
+
+\subsection*{MOFA 参数配置}
+
+调整 MOFA 潜在因子数量和收敛参数：
+
+\begin{verbatim}
+mofa:
+  n_factors: 15              # 潜在因子数量
+  max_iteration: 200         # 最大迭代次数
+  convergence_mode: "fast"   # 收敛模式：fast, medium, slow
+  seed: 42
+\end{verbatim}
+
+\section*{附录 F: 故障排除}
+
+\subsection*{常见问题与解决方案}
+
+\begin{enumerate}
+    \item \textbf{问题}：\texttt{KeyError: 'sample'}
+    
+    \textbf{原因}：临床数据文件格式不匹配，预期 TSV 格式，实际为其他格式
+    
+    \textbf{解决}：检查 \texttt{datasets/brca\_pam50.csv} 的分隔符，确保为 Tab 分隔
+    
+    \item \textbf{问题}：MOFA 训练失败，\texttt{IndexError: tuple index out of range}
+    
+    \textbf{原因}：MOFA 输入数据格式不正确，或样本数过少
+    
+    \textbf{解决}：确保在 \texttt{src/features/mofa.py} 中数据格式为 nested list（views × groups）
+    
+    \item \textbf{问题}：内存不足，处理大规模甲基化数据
+    
+    \textbf{原因}：甲基化数据维度过高（450,000 特征）
+    
+    \textbf{解决}：增加 \texttt{variance\_cutoff} 参数值，保留更少特征；或采用样本子集进行实验
+    
+    \item \textbf{问题}：模型精度低于预期
+    
+    \textbf{原因}：可能是特征选择不当，或 SVM 超参数未调优
+    
+    \textbf{解决}：进行网格搜索或随机搜索调优 SVM 参数 $C$ 和 $\gamma$
+\end{enumerate}
+
+\subsection*{性能优化建议}
+
+\begin{itemize}
+    \item 对于大规模数据，考虑使用 GPU 加速的库（如 CuPy、RAPIDS）
+    \item 使用并行处理加速特征选择：\texttt{n\_jobs=-1}
+    \item 对甲基化数据进行增量处理，避免一次性加载所有特征
+    \item 利用 joblib 进行模型训练的并行化
+\end{itemize}

@@ -1,0 +1,79 @@
+\section{方法公式化描述}
+
+\subsection{RNA 对数变换与标准化}
+
+设 RNA 表达矩阵为 $X^{(r)} \in \mathbb{R}^{p_r \times n}$，其中 $p_r$ 表示基因数，$n$ 表示样本数。对 RNA 数据进行对数变换时，本文采用如下形式：
+\[
+\tilde{X}^{(r)}_{ij} = \log_2\left(X^{(r)}_{ij} + 1\right).
+\]
+
+该变换的目的在于抑制极端高表达值对模型学习的影响，并改善表达分布的偏态性。随后，对每个特征进行标准化。对于第 $j$ 个特征，其 z-score 形式可写为：
+\[
+Z_{ij} = \frac{\tilde{X}_{ij} - \mu_j}{\sigma_j},
+\]
+其中 $\mu_j$ 与 $\sigma_j$ 分别表示训练集上第 $j$ 个特征的均值与标准差。
+
+\subsection{高方差特征筛选}
+
+考虑到多组学数据具有典型的 $p \gg n$ 特征结构，本文采用方差筛选保留最具区分度的特征。设第 $j$ 个特征的样本方差为：
+\[
+\mathrm{Var}(x_j) = \frac{1}{n-1} \sum_{i=1}^{n} (x_{ij} - \bar{x}_j)^2,
+\]
+其中 $\bar{x}_j$ 是第 $j$ 个特征的均值。将所有特征按方差从大到小排序后，保留前 $K$ 个特征作为输入。
+
+从统计意义上看，高方差特征筛选假设“样本间波动更大的特征更可能携带分类信息”。虽然这一假设并不总是成立，但在没有额外生物先验约束时，它是一个简单、有效且工程可实现性很强的选择。
+
+\subsection{Concat 融合}
+
+设 RNA 特征矩阵经预处理后为 $Z^{(r)} \in \mathbb{R}^{n \times d_r}$，甲基化特征矩阵为 $Z^{(m)} \in \mathbb{R}^{n \times d_m}$，则拼接融合可表示为：
+\[
+Z^{(c)} = [Z^{(r)} \;\Vert\; Z^{(m)}] \in \mathbb{R}^{n \times (d_r + d_m)}.
+\]
+
+该方式没有引入额外参数，因而是最简单的多组学融合基线。其性能主要取决于预处理是否合理，以及分类器是否能在高维拼接空间中找到稳定边界。
+
+\subsection{MOFA 潜在因子分解}
+
+对于两个组学视图，MOFA 可抽象为寻找一个低维潜变量矩阵 $W \in \mathbb{R}^{n \times q}$，使得每个组学数据都可以由该潜变量和对应权重矩阵近似重构：
+\[
+Z^{(r)} \approx W A^{(r)\top}, \qquad Z^{(m)} \approx W A^{(m)\top},
+\]
+其中 $A^{(r)}$ 与 $A^{(m)}$ 分别是 RNA 和甲基化对应的权重矩阵，$q$ 是潜因子数。
+
+从优化角度看，MOFA 的目标可以概括为最小化重构误差与正则项之和：
+\[
+\min_{W, A^{(r)}, A^{(m)}} \; \mathcal{L} = \|Z^{(r)} - W A^{(r)\top}\|_F^2 + \|Z^{(m)} - W A^{(m)\top}\|_F^2 + \lambda \Omega(W, A),
+\]
+其中 $\Omega(\cdot)$ 表示稀疏或先验约束项。实际 MOFA 实现比这一简化表达更复杂，但其核心思想基本一致。
+
+在分类任务中，$W$ 可作为新的低维输入送入下游分类器。与原始特征相比，潜因子空间通常具有更低维度、更低噪声和更强的跨组学共享结构，因此常被用于聚类、可视化和分类。
+
+\subsection{SVM 分类器}
+
+本文采用支持向量机作为统一分类器。对于二分类情况，SVM 的目标函数可写为：
+\[
+\min_{\mathbf{w}, b, \xi} \; \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^{n} \xi_i
+\]
+\[
+\text{s.t. } y_i (\mathbf{w}^\top \phi(\mathbf{x}_i) + b) \ge 1 - \xi_i, \quad \xi_i \ge 0.
+\]
+
+其中 $\phi(\cdot)$ 表示核映射，$C$ 是惩罚系数，$\xi_i$ 是松弛变量。对于多分类任务，SVM 通常通过一对多或一对一策略扩展。当前实现中采用 scikit-learn 的 \texttt{SVC(probability=True)}，其默认核函数为 RBF，因此能够在一定程度上处理非线性边界问题。
+
+\subsection{分类评价指标}
+
+在分类任务中，准确率定义为：
+\[
+\mathrm{Accuracy} = \frac{\text{预测正确的样本数}}{\text{总样本数}}.
+\]
+
+对于第 $k$ 类，精确率、召回率与 F1 值分别定义为：
+\[
+\mathrm{Precision}_k = \frac{TP_k}{TP_k + FP_k}, \qquad
+\mathrm{Recall}_k = \frac{TP_k}{TP_k + FN_k},
+\]
+\[
+\mathrm{F1}_k = \frac{2 \cdot \mathrm{Precision}_k \cdot \mathrm{Recall}_k}{\mathrm{Precision}_k + \mathrm{Recall}_k}.
+\]
+
+其中 $TP_k$、$FP_k$、$FN_k$ 分别表示第 $k$ 类的真阳性、假阳性和假阴性。考虑到类别不平衡可能影响单一准确率的解释，本文同时关注宏平均和加权平均指标，以便从整体和类别层面双重观察模型表现。

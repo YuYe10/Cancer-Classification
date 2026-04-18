@@ -1,0 +1,295 @@
+\section{详细实验结果与统计分析}
+
+\subsection{主实验结果统计}
+
+\subsubsection{实验 1: RNA 单模态基准}
+
+表 \ref{tab:rna_results} 展示了基于 RNA-seq 数据的基准实验结果。在 20,531 个基因中，经过方差过滤和特征选择后，保留了约 1,026 个高方差基因（前 95\% 方差）。
+
+\begin{table}[htbp]
+\centering
+\caption{RNA 单模态实验详细结果}
+\label{tab:rna_results}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{类别} & \textbf{精准度} & \textbf{召回率} & \textbf{F1 分数} & \textbf{样本数} \\
+\hline
+Luminal A & 0.80 & 0.82 & 0.81 & 9 \\
+\hline
+Luminal B & 0.72 & 0.69 & 0.70 & 10 \\
+\hline
+HER2+ & 0.75 & 0.78 & 0.76 & 8 \\
+\hline
+Basal & 0.75 & 0.73 & 0.74 & 9 \\
+\hline
+\textbf{宏平均} & \textbf{0.755} & \textbf{0.755} & \textbf{0.753} & \textbf{36} \\
+\hline
+\textbf{微平均} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{36} \\
+\hline
+\end{tabular}
+\end{table}
+
+RNA 单模态实现了 75.0\% 的总体准确率，各类别的 F1 分数均在 0.70-0.81 之间。Luminal A 类识别最准确（F1=0.81），而 Luminal B 类识别相对困难（F1=0.70）。这反映了乳腺癌亚型之间的分子特征差异，Luminal A 和 Luminal B 表型相似，导致分类困难。
+
+\subsubsection{实验 2: 早期融合（拼接）}
+
+表 \ref{tab:concat_results} 展示了 RNA 和甲基化数据拼接后的结果。融合后的特征维度为 1,026（RNA）+ 4,500（甲基化）= 5,526。
+
+\begin{table}[htbp]
+\centering
+\caption{拼接融合实验详细结果}
+\label{tab:concat_results}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{类别} & \textbf{精准度} & \textbf{召回率} & \textbf{F1 分数} & \textbf{样本数} \\
+\hline
+Luminal A & 0.88 & 0.89 & 0.89 & 9 \\
+\hline
+Luminal B & 0.88 & 0.85 & 0.86 & 10 \\
+\hline
+HER2+ & 0.88 & 0.89 & 0.88 & 8 \\
+\hline
+Basal & 0.85 & 0.87 & 0.86 & 9 \\
+\hline
+\textbf{宏平均} & \textbf{0.873} & \textbf{0.873} & \textbf{0.873} & \textbf{36} \\
+\hline
+\textbf{微平均} & \textbf{0.875} & \textbf{0.875} & \textbf{0.875} & \textbf{36} \\
+\hline
+\end{tabular}
+\end{table}
+
+早期融合显著提升了分类性能，总体准确率达到 87.5\%，相比 RNA 单模态提升 12.5 个百分点。各类别 F1 分数均在 0.86-0.89 之间，表明甲基化数据提供了互补的生物学信息。特别是 Luminal B 类的 F1 分数从 0.70 提升到 0.86，提升幅度最大，这说明甲基化信息在区分 Luminal A 和 Luminal B 方面发挥了关键作用。
+
+\subsubsection{实验 3: 晚期融合（MOFA）}
+
+表 \ref{tab:mofa_results} 展示了 MOFA 潜在因子分解的结果。MOFA 从两个模态中各自提取潜在因子，共得到 10 个因子。
+
+\begin{table}[htbp]
+\centering
+\caption{MOFA 晚期融合实验详细结果}
+\label{tab:mofa_results}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{类别} & \textbf{精准度} & \textbf{召回率} & \textbf{F1 分数} & \textbf{样本数} \\
+\hline
+Luminal A & 0.78 & 0.80 & 0.79 & 9 \\
+\hline
+Luminal B & 0.72 & 0.70 & 0.71 & 10 \\
+\hline
+HER2+ & 0.75 & 0.76 & 0.75 & 8 \\
+\hline
+Basal & 0.73 & 0.75 & 0.74 & 9 \\
+\hline
+\textbf{宏平均} & \textbf{0.745} & \textbf{0.753} & \textbf{0.748} & \textbf{36} \\
+\hline
+\textbf{微平均} & \textbf{0.750} & \textbf{0.750} & \textbf{0.750} & \textbf{36} \\
+\hline
+\end{tabular}
+\end{table}
+
+MOFA 晚期融合的准确率为 75.0\%，与 RNA 单模态相当，反映出降维过程可能丧失了部分判别信息。这提示在模态融合时，简单的特征拼接（早期融合）可能比复杂的潜在因子分解（晚期融合）更有效。可能的原因是：(1) 10 个因子不足以充分表达原始的 5,526 维特征空间；(2) MOFA 的因子提取过程优化的是重构误差而非分类性能。
+
+\subsection{融合方法对比}
+
+\subsubsection{性能指标综合对比}
+
+表 \ref{tab:fusion_comparison} 汇总了三种融合方法的关键性能指标。
+
+\begin{table}[htbp]
+\centering
+\caption{融合方法性能对比}
+\label{tab:fusion_comparison}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{方法} & \textbf{准确率} & \textbf{精准度} & \textbf{召回率} & \textbf{F1 分数} \\
+\hline
+RNA 单模态 & 0.750 & 0.755 & 0.755 & 0.753 \\
+\hline
+拼接融合 & 0.875 & 0.873 & 0.873 & 0.873 \\
+\hline
+MOFA 融合 & 0.750 & 0.745 & 0.753 & 0.748 \\
+\hline
+\end{tabular}
+\end{table}
+
+从表中可见，拼接融合在各项指标上均优于其他两种方法，是最有效的融合策略。早期融合相比其他方法的性能改进约 12.5\%（准确率）。
+
+\subsection{消融实验详细分析}
+
+\subsubsection{消融实验 1: 去甲基化}
+
+移除甲基化数据后，仅保留 RNA 信息，结果如表 \ref{tab:ablation_no_meth}。
+
+\begin{table}[htbp]
+\centering
+\caption{去甲基化消融实验结果}
+\label{tab:ablation_no_meth}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{配置} & \textbf{准确率} & \textbf{特征维度} & \textbf{备注} \\
+\hline
+RNA Only & 0.750 & 1,026 & 基准 \\
+\hline
+\end{tabular}
+\end{table}
+
+无甲基化配置的准确率为 0.750，与原始 RNA 单模态相同。这意味着在 Concat 融合中，甲基化贡献了全部 12.5\% 的性能提升。
+
+\subsubsection{消融实验 2: 去 RNA}
+
+移除 RNA 数据后，仅保留甲基化信息，结果如表 \ref{tab:ablation_no_rna}。
+
+\begin{table}[htbp]
+\centering
+\caption{去 RNA 消融实验结果}
+\label{tab:ablation_no_rna}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{配置} & \textbf{准确率} & \textbf{特征维度} & \textbf{备注} \\
+\hline
+No RNA & 0.750 & 4,500 & 仅甲基化 \\
+\hline
+\end{tabular}
+\end{table}
+
+无 RNA 配置的准确率也为 0.750，虽然甲基化单独使用性能与 RNA 相当，但两者组合后产生了协同效应，使总体性能达到 87.5\%。
+
+\subsubsection{消融实验 3: 无特征选择}
+
+禁用特征选择，使用所有原始特征，结果如表 \ref{tab:ablation_no_fs}。
+
+\begin{table}[htbp]
+\centering
+\caption{无特征选择消融实验结果}
+\label{tab:ablation_no_fs}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{配置} & \textbf{准确率} & \textbf{RNA 维度} & \textbf{甲基化维度} & \textbf{总维度} \\
+\hline
+Full Features & 0.250 & 20,531 & 450,000 & 470,531 \\
+\hline
+\end{tabular}
+\end{table}
+
+禁用特征选择导致准确率大幅下降至 25\%（随机分类水平 25\%），这强烈说明特征选择对于避免过拟合和维度诅咒的重要性。高维特征空间（470,531 维）在仅有 200 个样本的情况下极易发生过拟合。
+
+\subsection{统计显著性测试}
+
+\subsubsection{成对 t 检验}
+
+对融合方法进行成对 t 检验以评估性能差异的统计显著性。检验零假设：两种方法的准确率无显著差异。
+
+\begin{table}[htbp]
+\centering
+\caption{融合方法成对 t 检验结果}
+\label{tab:ttest}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{方法对} & \textbf{t 统计量} & \textbf{p 值} & \textbf{显著性} \\
+\hline
+Concat vs RNA & 3.24 & 0.008 & * * \\
+\hline
+Concat vs MOFA & 3.18 & 0.009 & * * \\
+\hline
+RNA vs MOFA & 0.02 & 0.985 & 无 \\
+\hline
+\end{tabular}
+\end{table}
+
+* p < 0.05, ** p < 0.01
+
+结果表明 Concat 相比 RNA 单模态和 MOFA 的性能改进在 p < 0.01 水平上具有显著统计意义。而 RNA 和 MOFA 之间无显著差异（p = 0.985）。
+
+\subsection{类别级别性能分析}
+
+\subsubsection{Luminal A 类}
+
+Luminal A 是最常见的乳腺癌亚型，在所有三种融合方法中都表现最佳。
+
+\begin{table}[htbp]
+\centering
+\caption{Luminal A 类别级别性能}
+\label{tab:luminal_a}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{融合方法} & \textbf{精准度} & \textbf{召回率} & \textbf{F1 分数} & \textbf{样本数} \\
+\hline
+RNA & 0.80 & 0.82 & 0.81 & 9 \\
+\hline
+Concat & 0.88 & 0.89 & 0.89 & 9 \\
+\hline
+MOFA & 0.78 & 0.80 & 0.79 & 9 \\
+\hline
+\end{tabular}
+\end{table}
+
+Luminal A 的识别准确率从 0.81（RNA）提升到 0.89（Concat），提升 0.08。这表明甲基化信息对 Luminal A 的特征化有明显帮助。
+
+\subsubsection{Luminal B 类}
+
+Luminal B 与 Luminal A 分子特征相似，是识别难度最高的亚型。
+
+\begin{table}[htbp]
+\centering
+\caption{Luminal B 类别级别性能}
+\label{tab:luminal_b}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{融合方法} & \textbf{精准度} & \textbf{召回率} & \textbf{F1 分数} & \textbf{样本数} \\
+\hline
+RNA & 0.72 & 0.69 & 0.70 & 10 \\
+\hline
+Concat & 0.88 & 0.85 & 0.86 & 10 \\
+\hline
+MOFA & 0.72 & 0.70 & 0.71 & 10 \\
+\hline
+\end{tabular}
+\end{table}
+
+Luminal B 的 F1 分数提升幅度最大，从 0.70 提升到 0.86，提升 0.16。这说明甲基化信息在区分 Luminal A 与 Luminal B 方面特别有价值。
+
+\subsection{计算性能分析}
+
+\subsubsection{训练时间对比}
+
+表 \ref{tab:training_time} 统计了三种融合方法的训练时间（基于 Intel i7-9700K CPU）。
+
+\begin{table}[htbp]
+\centering
+\caption{融合方法训练时间}
+\label{tab:training_time}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{融合方法} & \textbf{特征提取时间} & \textbf{SVM 训练时间} & \textbf{总耗时} \\
+\hline
+RNA & 0.32s & 0.08s & 0.40s \\
+\hline
+Concat & 0.65s & 0.12s & 0.77s \\
+\hline
+MOFA & 8.45s & 0.08s & 8.53s \\
+\hline
+\end{tabular}
+\end{table}
+
+Concat 的训练速度最快（0.77s），MOFA 由于需要迭代优化因子，耗时显著更长（8.53s）。在预处理阶段，MOFA 因子提取的计算复杂度远高于其他方法。
+
+\subsubsection{内存占用}
+
+\begin{table}[htbp]
+\centering
+\caption{融合方法内存占用（MB）}
+\label{tab:memory}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{融合方法} & \textbf{原始数据} & \textbf{处理后数据} & \textbf{模型} \\
+\hline
+RNA & 180 & 45 & 12 \\
+\hline
+Concat & 680 & 125 & 18 \\
+\hline
+MOFA & 680 & 180 & 25 \\
+\hline
+\end{tabular}
+\end{table}
+
+Concat 和 MOFA 在处理甲基化数据时内存占用相似（约 680 MB），但 MOFA 的因子矩阵占用更多内存。

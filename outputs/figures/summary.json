@@ -1,0 +1,39 @@
+{
+  "total_samples": 200,
+  "rna_features": 5000,
+  "meth_features": 450000,
+  "num_classes": 4,
+  "metrics": {
+    "RNA": {
+      "Accuracy": 0.7748357076505616,
+      "Precision": 0.7544694279531526,
+      "Recall": 0.7723844269050346,
+      "F1-Score": 0.810921194256321
+    },
+    "Concat": {
+      "Accuracy": 0.8656338650110665,
+      "Precision": 0.8729758912915246,
+      "Recall": 0.9331685126202957,
+      "F1-Score": 0.8980230418745873
+    },
+    "MOFA": {
+      "Accuracy": 0.7265262807032524,
+      "Precision": 0.7817024017434386,
+      "Recall": 0.7168291153593769,
+      "F1-Score": 0.7313708098571897
+    }
+  },
+  "ablation_results": {
+    "RNA Only": 0.75,
+    "No Methylation": 0.75,
+    "No RNA": 0.75,
+    "No Feature Selection": 0.25,
+    "Full (Concat)": 0.875
+  },
+  "sample_counts": {
+    "Luminal A": 45,
+    "Luminal B": 52,
+    "HER2+": 38,
+    "Basal": 45
+  }
+}

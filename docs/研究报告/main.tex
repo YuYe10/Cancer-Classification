@@ -1,0 +1,65 @@
+\documentclass[UTF8,12pt,a4paper]{ctexart}
+
+\usepackage{geometry}
+\geometry{left=2.6cm,right=2.6cm,top=2.5cm,bottom=2.5cm}
+\usepackage{setspace}
+\setstretch{1.4}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+\title{基于TCGA-BRCA多组学融合的乳腺癌分子亚型分类研究报告}
+\author{YuYe10\quad Cancer-Classification Project}
+\date{2026年4月}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+乳腺癌是一类高度异质性的恶性肿瘤，其分子亚型在治疗决策、预后评估和复发风险预测中具有关键作用。与仅依赖单一组学相比，RNA-seq 与 DNA 甲基化等多组学数据能够从功能表达与表观遗传调控两个层面刻画肿瘤生物学特征，从而更全面地反映肿瘤内部差异。基于这一认识，本文围绕 TCGA-BRCA 数据集构建了一个面向乳腺癌分子亚型分类的多组学机器学习框架，系统比较了 RNA-only、Concat 与 MOFA 三种融合策略，并进一步设计了去甲基化、去 RNA 与不做特征选择三类消融实验，以分析各模块对分类性能的贡献。
+
+本文首先梳理了多组学疾病分类的常见任务与方法谱系，结合 TCGA 与 UCSC Xena 数据资源说明实验数据来源与预处理流程。随后从样本对齐、标签构建、特征筛选、标准化、融合建模与结果评估等方面，对当前实验代码中的实现方式进行了工程化整理。主实验采用支持向量机作为统一分类器，在保持相同训练-测试划分的前提下比较不同融合方案。实验结果表明，多组学融合策略整体优于单组学基线，而高方差特征筛选显著影响模型的稳定性与泛化能力。与此同时，MOFA 作为潜在表示学习方法，在实验流程中展示了较强的融合能力和良好的可解释潜力，但也对样本规模、特征维度及训练策略较为敏感。
+
+在方法论层面，本文强调了多组学实验中几个关键问题：其一，临床标签文件格式与样本命名一致性决定了样本对齐的可靠性；其二，训练/测试划分前后的预处理顺序会直接影响是否发生信息泄露；其三，MOFA 等表示学习方法与传统拼接方法在数据接口、维度约束和评估方式上存在显著差异。基于当前仓库的实现，本文形成了一套可复现的主实验与消融实验流程，并给出适合论文写作与课程汇报的完整研究报告框架。
+
+\vspace{0.5em}
+\noindent\textbf{关键词：}多组学融合；乳腺癌；TCGA-BRCA；分子亚型分类；MOFA；支持向量机；消融实验
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\input{sections/01-background}
+\input{sections/07-related-work}
+\input{sections/16-related-work-extended}
+\input{sections/02-data}
+\input{sections/03-method}
+\input{sections/08-method-math}
+\input{sections/04-experiments}
+\input{sections/09-results-visualization}
+\input{sections/12-implementation-details}
+\input{sections/13-error-analysis}
+\input{sections/10-discussion}
+\input{sections/05-conclusion}
+\input{sections/06-summary}
+\input{sections/11-references}
+\input{sections/14-appendix-config}
+
+\end{document}

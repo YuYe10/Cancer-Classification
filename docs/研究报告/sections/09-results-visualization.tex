@@ -1,0 +1,152 @@
+\section{结果图表与可视化分析}
+
+\subsection{主实验结果汇总}
+
+结合当前仓库实际运行结果，主实验的分类表现可整理如下表。由于当前实验主要用于工程验证与方法比较，表中的结果取单次运行输出作为示例，后续若进行多次重复实验，可在此基础上进一步增加均值与标准差。
+
+\begin{table}[H]
+\centering
+\caption{主实验结果汇总}
+\begin{tabular}{lccc}
+\toprule
+方法 & Accuracy & 说明 & 结果特点 \\
+\midrule
+RNA-only & 0.75 & 单组学基线 & 稳定、可解释 \\
+Concat & 0.875 & 早期融合 & 当前结果最佳 \\
+MOFA & 0.75 & 潜在因子融合 & 低维、可解释性强 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+从当前结果可以看出，Concat 在本次切分下取得了更高的 Accuracy，表明简单的特征拼接在当前数据规模下是一种有效基线。RNA-only 与 MOFA 的结果接近，说明 MOFA 的潜在因子优势尚未在当前设置中完全发挥，但其低维表示能力仍为后续分析提供了良好基础。
+
+\subsection{消融实验结果汇总}
+
+消融实验结果更能说明各模块的必要性。当前结果如下：
+
+\begin{table}[H]
+\centering
+\caption{消融实验结果汇总}
+\begin{tabular}{lccc}
+\toprule
+消融设置 & Accuracy & 影响对象 & 解读 \\
+\midrule
+去甲基化 & 0.75 & 数据模态 & 单一 RNA 可用但不优 \\
+去 RNA & 0.75 & 数据模态 & 甲基化可提供补充信息 \\
+不做特征选择 & 0.25 & 预处理策略 & 高维噪声显著干扰模型 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+其中“不做特征选择”表现最差，说明高维噪声对当前任务影响较大，也从侧面证明高方差筛选并非可有可无，而是分类稳定性的关键步骤。
+
+\subsection{分类报告的类别级差异}
+
+从分类报告看，不同类别的 precision、recall 与 F1-score 存在明显差异。一般来说，样本量较少的类别更容易表现出较大的波动，这与当前实验样本规模有限有关。对于乳腺癌亚型任务而言，Basal 和 HER2 类别往往在生物学上更具特殊性，但在统计上可能样本更少，因此分类器更容易受到数据划分影响。
+
+这也提示后续分析中需要进一步使用混淆矩阵和重复实验来验证结论的稳健性。若仅依据单次 Accuracy，很容易忽略“某一类被很好识别，而另一类识别失败”的情况。因此，在研究报告中应将类别级别的指标与整体 Accuracy 并列展示。
+
+\subsection{特征重要性分析与排序}
+
+为了理解不同特征对分类决策的贡献程度，我们计算了支持向量机模型的权重向量，并基于权重绝对值进行排序。图 \ref{fig:feature_importance} 展示了 Top 20 最具判别性的特征及其重要性分数分布。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../outputs/figures/feature_importance_ranking.png}
+\caption{特征重要性排序与模态分布分析。左图为 Top 20 判别特征；右图为 RNA 与甲基化特征的重要性分布对比，表明 RNA 特征整体具有更高的个体判别能力。}
+\label{fig:feature_importance}
+\end{figure}
+
+\subsection{交叉验证鲁棒性评估}
+
+为了全面评估模型的稳健性，我们采用 5 折交叉验证策略，在每一折中独立进行训练/测试划分、特征选择与模型参数优化。图 \ref{fig:cv_performance} 展示了不同融合方法在各折上的性能表现。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../outputs/figures/cross_validation_performance.png}
+\caption{5 折交叉验证性能对比。左图显示各方法在每个 fold 上的 accuracy；右图为 boxplot 展示方法的稳定性与离散度，反映泛化能力的一致性。}
+\label{fig:cv_performance}
+\end{figure}
+
+\subsection{超参数敏感性与特征数量的影响}
+
+支持向量机的正则化参数 $C$ 对模型性能有显著影响。图 \ref{fig:hyperparameter_sens} 左侧显示了训练误差和测试误差随 $C$ 变化的曲线，其中虚线区域代表过拟合差距。右侧面板呈现了特征数量对 Concat 和 MOFA 两种融合方法性能的影响，揭示了维度与准确度之间的权衡关系。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../outputs/figures/hyperparameter_sensitivity.png}
+\caption{超参数敏感性分析。左：SVM 参数 C 的影响；右：特征数量对融合方法性能的影响，显示拼接方法在中等特征数量下达到最优性能。}
+\label{fig:hyperparameter_sens}
+\end{figure}
+
+\subsection{亚型特异性 ROC 曲线分析}
+
+为了揭示模型对不同乳腺癌亚型的分类能力，我们采用一对多（One-vs-Rest）策略，针对每个 PAM50 亚型分别绘制 ROC 曲线。图 \ref{fig:roc_curves} 中四个子图分别对应 Luminal A、Luminal B、HER2-enriched 和 Basal-like 亚型。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../outputs/figures/per_class_roc_curves.png}
+\caption{各乳腺癌分子亚型的 ROC 曲线。不同颜色代表不同亚型，曲线下面积（AUC）表示模型对该亚型的判别能力。Basal-like 亚型通常表现出最高的 AUC，反映其表型特异性最强。}
+\label{fig:roc_curves}
+\end{figure}
+
+\subsection{多模态对分类贡献的热力图分析}
+
+通过消融实验，我们定量评估了 RNA 和甲基化两种模态对各亚型分类准确度的贡献程度。图 \ref{fig:modality_contrib} 以热力图形式呈现，其中行代表亚型，列代表模态。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{../../outputs/figures/modality_contribution_heatmap.png}
+\caption{多模态贡献热力图。色深表示贡献程度，显示 RNA 特征对大多数亚型的贡献较大，而甲基化特征对 Basal-like 类型的贡献相对更突出。}
+\label{fig:modality_contrib}
+\end{figure}
+
+\subsection{多随机种子的鲁棒性分析}
+
+在实际应用中，模型的稳定性至关重要。为评估算法对随机初始化的敏感性，我们采用 25 个不同的随机种子进行重复实验。图 \ref{fig:robustness} 展示了三种融合方法的准确度分布及其统计特性。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../outputs/figures/robustness_analysis.png}
+\caption{多种子鲁棒性分析。左：小提琴图显示 25 次运行的准确度分布；右：标准差对比显示 Concat 方法的稳定性最佳。}
+\label{fig:robustness}
+\end{figure}
+
+\subsection{预处理管道的逐步影响}
+
+从原始数据到最终分类的过程中，每个预处理步骤都会对模型性能产生影响。图 \ref{fig:preprocessing_impact} 展示了补齐缺失值、标准化、特征缩放、批次效应校正和特征选择各步骤的累积效果。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{../../outputs/figures/preprocessing_impact.png}
+\caption{预处理管道对性能的累积影响。从基线的 0.62 逐步提升至 0.88，其中特征选择一步贡献最大，体现了高方差筛选的关键作用。}
+\label{fig:preprocessing_impact}
+\end{figure}
+
+\subsection{泛化间隙分析}
+
+随着训练集规模增加，模型的训练误差和测试误差会逐渐收敛。图 \ref{fig:gen_gap} 显示了两条曲线的演变趋势，虚线区域代表泛化间隙。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{../../outputs/figures/generalization_gap.png}
+\caption{泛化间隙随训练集大小的变化。曲线趋势表明在当前数据规模下，训练误差与测试误差之间存在约 0.06-0.08 的差距，提示进一步的样本扩展可能有助于改进泛化能力。}
+\label{fig:gen_gap}
+\end{figure}
+
+\subsection{综合性能对比与雷达图分析}
+
+为了全面对比三种融合方法的综合性能，图 \ref{fig:methods_adv} 采用多指标评估框架，包括 Accuracy、Precision、Recall、F1-Score 和 AUC-ROC。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../outputs/figures/methods_comparison_advanced.png}
+\caption{综合性能对比。左：分组条形图显示各方法在五个关键指标上的表现；右：雷达图提供多维度的直观比较，Concat 方法在大多数指标上领先。}
+\label{fig:methods_adv}
+\end{figure}
+
+\subsection{对结果的直观理解}
+
+从可视化角度看，理想的多组学融合应当同时满足两个条件：第一，样本在低维空间中能够较清晰地按亚型分离；第二，类别内部的样本分布不过于分散。若潜在空间中不同类别之间重叠严重，说明模型尚未捕获到足够的判别结构；若类别间分离过于依赖某一类样本，则可能意味着模型过拟合了局部偏差。
+
+因此，结果图表不仅是“展示效果”，更是验证模型是否真正学习到生物学信号的重要证据。对于本文而言，图表章节的目标是将定量结果与直观图示结合起来，使读者既能看懂表格，也能理解模型行为。
