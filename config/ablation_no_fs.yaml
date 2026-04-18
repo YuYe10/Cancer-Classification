@@ -1,0 +1,26 @@
+# Ablation Experiment: NO feature selection (keep all features)
+# Purpose: Verify the value of top-k feature selection in reducing overfitting
+# Hypothesis: Removing feature selection should increase risk of overfitting and potentially degrade generalization
+
+exp: concat
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  test_size: 0.2
+  random_state: 42
+
+mofa:
+  factors: 20
+
+ablation:
+  use_rna: true
+  use_meth: true
+  use_feature_selection: false

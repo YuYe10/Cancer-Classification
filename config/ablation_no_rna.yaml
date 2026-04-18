@@ -1,0 +1,26 @@
+# Ablation Experiment: Methylation-only (NO RNA)
+# Purpose: Verify the contribution of RNA data to classification performance
+# Hypothesis: Removing RNA should significantly decrease accuracy since RNA typically carries more expression signal
+
+exp: meth
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  test_size: 0.2
+  random_state: 42
+
+mofa:
+  factors: 20
+
+ablation:
+  use_rna: false
+  use_meth: true
+  use_feature_selection: true
