@@ -1,238 +1,128 @@
-# 🧬 Multi-Omics Subtype Classification (TCGA-BRCA)
+# Cancer-Classification
 
-> A research-oriented, fully reproducible pipeline for molecular subtype classification via multi-omics integration.
+TCGA-BRCA 多组学分子亚型分类项目。当前实现支持主实验对比、消融实验批量运行，以及配置驱动的可复现实验流程。
 
----
+## 项目目标
 
-## 📄 Abstract
+在单一癌种 TCGA-BRCA 内进行亚型分类，比较以下策略：
 
-Molecular subtype classification is a fundamental task in cancer research, enabling precision diagnosis and targeted therapy. However, single-omics data often fails to capture the complex biological heterogeneity of tumors.
+- RNA 单组学基线
+- RNA + 甲基化特征拼接（Concat）
+- MOFA 潜在因子融合
 
-In this project, we propose a **multi-omics integration pipeline** for subtype classification within TCGA-BRCA, leveraging:
+并补充三类消融实验：
 
-* Transcriptomics (RNA-seq)
-* Epigenomics (DNA methylation)
+- 去甲基化（仅 RNA）
+- 去 RNA（仅甲基化）
+- 不做特征选择
 
-We systematically compare three paradigms:
+## 目录结构
 
-1. **Single-omics baseline (RNA)**
-2. **Early fusion via feature concatenation**
-3. **Latent representation learning using MOFA**
-
-Experimental results demonstrate that **multi-omics integration, particularly via latent factor modeling, significantly improves classification performance and enhances biological interpretability**.
-
----
-
-## 🚀 Key Contributions
-
-* 🔬 End-to-end **multi-omics analysis pipeline**
-* 🧠 Integration of **MOFA latent factor modeling**
-* 📊 **Benchmark comparison** across integration strategies
-* 🔍 **Model interpretability (SHAP-based feature attribution)**
-* ⚙️ Fully **config-driven and reproducible framework**
-
----
-
-## 🧱 Project Structure
-
-```bash id="1z2x8p"
-multiomics-subtype/
-├── config/              # Experiment configs (YAML)
-├── datasets/            # Raw & processed datasets
-│   └── raw/
-│
+```text
+.
+├── config/
+│   ├── exp_rna.yaml
+│   ├── exp_concat.yaml
+│   ├── exp_mofa.yaml
+│   ├── ablation_no_meth.yaml
+│   ├── ablation_no_rna.yaml
+│   └── ablation_no_fs.yaml
+├── datasets/
+├── docs/
+│   ├── 实验方案.md
+│   └── 实验使用指南.md
+├── experiments/
+│   └── run.py
+├── scripts/
+│   └── run_ablation.sh
 ├── src/
-│   ├── data/            # Loading & preprocessing
-│   ├── features/        # Integration (MOFA)
-│   ├── models/          # Training & evaluation
-│   ├── visualization/   # Plotting
-│   ├── explain/         # SHAP analysis
+│   ├── data/
+│   ├── features/
+│   ├── models/
 │   └── pipeline.py
-│
-├── experiments/         # Entry scripts
-├── scripts/             # Batch execution
-├── outputs/             # Figures & logs
+└── run_all.sh
 ```
 
----
+## 环境准备
 
-## 📂 Dataset
-
-```bash id="c9o8n1"
-datasets/raw/
-├── rna.csv
-├── meth.csv
-└── clinical.csv
-```
-
-### Data Specification
-
-| Modality    | Feature Space | Description               |
-| ----------- | ------------- | ------------------------- |
-| RNA-seq     | ~20k genes    | TPM normalized expression |
-| Methylation | ~300k probes  | Beta values               |
-| Clinical    | Samples       | Subtype labels            |
-
----
-
-## ⚙️ Installation
-
-```bash id="a8v2w0"
-conda create -n multiomics python=3.9 -y
-conda activate multiomics
+```bash
 pip install -r requirements.txt
 ```
 
----
+默认使用仓库内解释器：
 
-## 🧪 Experiments
+- `./medical/bin/python3`
 
-### Run all experiments
+## 快速开始
 
-```bash id="2k9m4s"
-bash scripts/run_all.sh
+### 1) 运行主实验（RNA / Concat / MOFA）
+
+```bash
+bash run_all.sh
 ```
 
-### Run individually
+### 2) 运行消融实验（3 组）
 
-```bash id="9p0w3x"
-python experiments/run.py --config config/exp_rna.yaml
-python experiments/run.py --config config/exp_concat.yaml
-python experiments/run.py --config config/exp_mofa.yaml
+```bash
+bash scripts/run_ablation.sh
 ```
 
----
+### 3) 单独运行任一配置
 
-## 🧠 Methodology
+```bash
+PYTHONPATH=. ./medical/bin/python3 experiments/run.py --config config/exp_rna.yaml
+PYTHONPATH=. ./medical/bin/python3 experiments/run.py --config config/exp_concat.yaml
+PYTHONPATH=. ./medical/bin/python3 experiments/run.py --config config/exp_mofa.yaml
 
-### Overall Pipeline
-
-```text
-Raw Data
-   ↓
-Normalization (log2 / scaling)
-   ↓
-Variance-based Feature Selection
-   ↓
-Multi-omics Integration
-   ↓
-Classifier (Random Forest)
-   ↓
-Evaluation (Accuracy, ROC-AUC)
+PYTHONPATH=. ./medical/bin/python3 experiments/run.py --config config/ablation_no_meth.yaml
+PYTHONPATH=. ./medical/bin/python3 experiments/run.py --config config/ablation_no_rna.yaml
+PYTHONPATH=. ./medical/bin/python3 experiments/run.py --config config/ablation_no_fs.yaml
 ```
 
----
+## 当前评估输出
 
-### Integration Strategies
+每次运行会输出：
 
-| Strategy | Type          | Description                        |
-| -------- | ------------- | ---------------------------------- |
-| RNA-only | Baseline      | Single modality                    |
-| Concat   | Early Fusion  | Direct feature merging             |
-| MOFA     | Latent Fusion | Factorized representation learning |
+- `ACC`
+- 各类别 `precision / recall / f1-score / support`
+- `macro avg` 与 `weighted avg`
 
----
+## 数据与标签要求
 
-## 📊 Results
+临床标签文件默认读取：`datasets/brca_pam50.csv`
 
-### Quantitative Performance
+要求：
 
-| Method   | Accuracy   | ROC-AUC    |
-| -------- | ---------- | ---------- |
-| RNA-only | 0.74       | 0.79       |
-| Concat   | 0.78       | 0.83       |
-| MOFA     | ⭐ **0.84** | ⭐ **0.89** |
+- TSV 分隔
+- 包含 `sample` 列
+- 标签列为 `PAM50` 或 `label`
+- 标签映射：`LumA=0, LumB=1, HER2=2, Basal=3`
 
-> ✅ **MOFA achieves the best performance**, indicating that latent factor models better capture cross-omics interactions.
+## 防泄露流程说明
 
----
+当前流程采用：
 
-## 📈 Visualization
+1. 样本对齐与标签构建
+2. 训练/测试切分
+3. 在训练集上拟合预处理器（标准化）
+4. 用相同预处理器变换测试集
 
-### 🔹 t-SNE Projection (Latent Space)
+说明：
 
-```text
-[Figure Placeholder: outputs/figures/tsne_mofa.png]
-```
+- 由于当前 MOFA 接口仅提供拟合+抽取潜在因子，`mofa` 分支采用“合并样本拟合一次后再切分潜在因子”的实现以保证可运行。
 
-* MOFA latent space shows **clear subtype clustering**
-* Reduced overlap compared to RNA-only
+## 文档
 
----
+- 实验方案：[docs/实验方案.md](docs/实验方案.md)
+- 实验使用指南：[docs/实验使用指南.md](docs/实验使用指南.md)
 
-### 🔹 ROC Curve
+## 已验证命令
 
-```text
-[Figure Placeholder: outputs/figures/roc_curve.png]
-```
+以下命令已在当前仓库验证通过：
 
-* Integrated model achieves **higher separability**
-* Improved sensitivity-specificity tradeoff
+- `bash run_all.sh`
+- `bash scripts/run_ablation.sh`
 
----
+## License
 
-## 🔍 Interpretability
-
-We apply **SHAP (SHapley Additive exPlanations)** to analyze feature importance:
-
-```text
-[Figure Placeholder: outputs/figures/shap_summary.png]
-```
-
-### Key Findings
-
-* Top-ranked genes align with known cancer drivers
-* Methylation features contribute complementary signals
-* Confirms biological plausibility of the model
-
----
-
-## 🔬 Discussion
-
-* Multi-omics integration **reduces information loss**
-* Latent factor models outperform naive fusion
-* Feature selection is essential in high-dimensional settings
-
----
-
-## 📦 Reproducibility
-
-* YAML-based experiment configs
-* Fixed random seeds
-* Modular design (plug-and-play components)
-
----
-
-## 🧩 Limitations
-
-* Limited to two omics modalities
-* No survival analysis included
-* MOFA hyperparameters not fully optimized
-
----
-
-## 🔮 Future Work
-
-* Graph Neural Networks for pathway modeling
-* Multi-view contrastive learning
-* Survival prediction (Cox / DeepSurv)
-
----
-
-## 👨‍💻 Authors
-
-* Bioinformatics & AI Infra Project Team 3
-
----
-
-## ⭐ Acknowledgements
-
-* TCGA (The Cancer Genome Atlas)
-* UCSC Xena
-* MOFA framework
-
----
-
-## 📜 License
-
-MIT License
+MIT

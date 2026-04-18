@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 
@@ -41,6 +40,9 @@ class RNAPreprocessor:
     
     def transform(self, rna):
         """Transform data using fitted statistics."""
+        if self.selected_features is None:
+            raise ValueError("selected_features must be set before transform()")
+
         rna_log = np.log2(rna + 1)
         # Keep only features that are both in selected_features and in data
         features_to_use = [f for f in self.selected_features if f in rna_log.index]
@@ -85,6 +87,9 @@ class MethPreprocessor:
     
     def transform(self, meth):
         """Transform data using fitted statistics."""
+        if self.selected_features is None:
+            raise ValueError("selected_features must be set before transform()")
+
         meth_clean = meth.dropna()
         # Keep only features that are both in selected_features and in data
         features_to_use = [f for f in self.selected_features if f in meth_clean.index]

@@ -75,6 +75,8 @@ def run_pipeline(config):
     X_test_list = []
     
     if use_rna:
+        if rna_features is None:
+            raise ValueError("RNA features were not initialized")
         rna_preprocessor = RNAPreprocessor(top_k=len(rna_features), selected_features=rna_features)
         rna_preprocessor.fit(X_rna_train)
         X_rna_train_processed = rna_preprocessor.transform(X_rna_train)
@@ -83,6 +85,8 @@ def run_pipeline(config):
         X_test_list.append(X_rna_test_processed)
     
     if use_meth:
+        if meth_features is None:
+            raise ValueError("Methylation features were not initialized")
         meth_preprocessor = MethPreprocessor(top_k=len(meth_features), selected_features=meth_features)
         meth_preprocessor.fit(X_meth_train)
         X_meth_train_processed = meth_preprocessor.transform(X_meth_train)
@@ -112,9 +116,15 @@ def run_pipeline(config):
     elif exp_type == "mofa":
         if not (use_rna and use_meth):
             raise ValueError("exp='mofa' requires both use_rna=True and use_meth=True")
-        # MOFA expects features x samples, and we have samples x features here
-        X_train = run_mofa(X_train_list[0].T, X_train_list[1].T, config['mofa']['factors'])
-        X_test = run_mofa(X_test_list[0].T, X_test_list[1].T, config['mofa']['factors'])
+        # MOFA expects features x samples. Since run_mofa currently exposes fit+extract only,
+        # fit on combined samples once and split latent factors back into train/test.
+        rna_combined = np.concatenate([X_train_list[0], X_test_list[0]], axis=0)
+        meth_combined = np.concatenate([X_train_list[1], X_test_list[1]], axis=0)
+        Z_all = run_mofa(rna_combined, meth_combined, config['mofa']['factors'])
+
+        n_train = X_train_list[0].shape[0]
+        X_train = Z_all[:n_train]
+        X_test = Z_all[n_train:]
     
     else:
         raise ValueError(f"Unknown exp type: {exp_type}")

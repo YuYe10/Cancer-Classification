@@ -13,6 +13,12 @@ def train_svm(X_train, y_train, config):
     Returns:
         model: Trained SVM model
     """
-    model = SVC(probability=True)
+    model_cfg = config.get('model', {})
+    model = SVC(
+        C=model_cfg.get('svm_c', 1.0),
+        kernel=model_cfg.get('svm_kernel', 'rbf'),
+        probability=True,
+        random_state=model_cfg.get('random_state', 42),
+    )
     model.fit(X_train, y_train)
     return model
