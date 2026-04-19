@@ -1,0 +1,106 @@
+% This section can be directly inserted into the main paper
+% Insert into: docs/研究报告/sections/04-experiments.tex (Results subsection)
+
+\subsection{评估框架与统计方法}
+
+为了确保结果的可靠性与可重复性，我们采用了严格的重复分层K折交叉验证框架，替代了传统的单次holdout分割。
+
+\subsubsection{交叉验证设计}
+
+我们采用 \textbf{重复分层5折交叉验证} (repeated stratified 5-fold cross-validation)，具体设置为：
+\begin{itemize}
+    \item \textbf{折数}：5折
+    \item \textbf{重复次数}：3次
+    \item \textbf{总评估次数}：15个fold
+    \item \textbf{分层策略}：按照目标类别进行分层抽样，保证各fold的类别分布一致
+\end{itemize}
+
+这一设计相比单次holdout分割具有以下优势：
+\begin{enumerate}
+    \item \textbf{消除随机性}：15个fold提供了更稳定的性能估计
+    \item \textbf{更高的统计功效}：数据点增加15倍，提升了显著性检验的检验力
+    \item \textbf{合理的样本利用}：每个样本既被用于训练也被用于验证
+\end{enumerate}
+
+\subsubsection{置信区间计算}
+
+对于每个性能指标，我们计算 \textbf{95\%自助法置信区间} (95\% bootstrap confidence interval)：
+
+\begin{equation}
+\text{CI}_{95\%} = \left[ \mu - z_{0.975} \cdot \frac{\sigma}{\sqrt{n}}, \quad \mu + z_{0.975} \cdot \frac{\sigma}{\sqrt{n}} \right]
+\end{equation}
+
+其中：
+\begin{itemize}
+    \item $\mu$ 为fold-level指标的均值
+    \item $\sigma$ 为标准差 (无偏估计，ddof=0)
+    \item $n$ 为fold数量 (n=15)
+    \item $z_{0.975} = 1.96$ 为标准正态分布的0.975分位数
+\end{itemize}
+
+置信区间的宽度直接反映了估计的不确定性：区间越窄，说明估计越精确。
+
+\subsubsection{显著性检验}
+
+对于不同方法之间的对比，我们采用 \textbf{排列检验} (permutation test) 来评估观测到的性能差异是否统计显著。其步骤如下：
+\begin{enumerate}
+    \item 合并方法A和方法B的15个fold分数；
+    \item 计算观测差异 $\Delta_{\text{obs}} = |\mu_A - \mu_B|$；
+    \item 重复 $10000$ 次随机打乱并重分组，得到每次差异 $\Delta_i$；
+    \item 计算 $p\text{-value} = \frac{\#(\Delta_i \geq \Delta_{\text{obs}})}{10000}$。
+\end{enumerate}
+
+这一方法不依赖于任何分布假设，适用于样本量较小的情况。
+
+\subsection{主要结果}
+
+表~\ref{tab:method-comparison} 总结了不同融合方法在repeated-CV设置下的性能对比。该表由脚本 \texttt{scripts/generate\_comparison\_tables.py} 基于日志文件自动生成，来源文件为 \texttt{outputs/logs/method\_comparison.tex}。
+
+\input{../../outputs/logs/method_comparison.tex}
+
+\subsubsection{关键发现}
+
+\paragraph{1. 多组学融合的边际收益有限}
+Stacking集成方法的准确率为 $0.7940 \pm 0.1648$ (95\% CI: [0.7106, 0.8775])，相比于RNA-only的 $0.7655 \pm 0.1462$ (95\% CI: [0.6915, 0.8395]) 仅提升了 2.86\%。排列检验表明这一差异不具统计显著性 ($p = 0.639$)。
+
+这提示在当前的样本量 ($n \approx 200$) 下，仅有RNA特征已可提供充分的分类信息，额外融合甲基化数据未能显著改进性能。
+
+\paragraph{2. 不确定性的量化}
+Stacking方法的置信区间仍较宽 (95\% CI: [0.7106, 0.8775])，这反映了meta-learner训练集规模小导致的较高方差。而RNA-only的置信区间为 (95\% CI: [0.6915, 0.8395])，提示该方法在当前数据规模下具有可比但略低的性能中心。
+
+从指标的方差角度，这进一步印证了：当前样本量下，简单的单模态分类器可能比复杂的融合模型具有更好的泛化性能。
+
+\paragraph{3. 改进相比旧的holdout设计}
+在以往的单次holdout分割 (80/20 split, $n_{\text{test}} = 8$) 中，三种主要方法的准确率均为0.875，无法区分性能。升级后的repeated-CV框架揭示了真实的性能差异，虽然在统计上不显著，但提供了更可信的估计。
+
+\subsubsection{性能指标对比}
+
+除准确率外，我们还报告了以下指标的repeated-CV结果：
+
+\begin{itemize}
+    \item \textbf{平衡准确率} (Balanced Accuracy)：对不平衡类别鲁棒
+    \item \textbf{宏平均F1分数} (Macro-F1)：对少数类关注
+    \item \textbf{加权平均F1分数} (Weighted-F1)：考虑类别频率
+\end{itemize}
+
+详见表~\ref{tab:method-comparison} 的完整结果。
+
+\subsection{可视化}
+
+图~\ref{fig:accuracy-ci} 展示了不同方法的准确率及其95\%置信区间。置信区间的重叠表明两种方法在统计上可能不存在显著差异。
+
+图~\ref{fig:accuracy-distribution} 则展示了各fold分数的分布情况，通过箱线图直观地呈现了方差与离群值。
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../../outputs/figures/statistical_accuracy_ci.png}
+    \caption{不同方法的准确率与95\%置信区间对比。柱高表示均值，误差条表示置信区间。}
+    \label{fig:accuracy-ci}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{../../outputs/figures/statistical_accuracy_distribution.png}
+    \caption{不同方法fold-level准确率的分布。箱线图展示了中位数、四分位数范围与离群值。}
+    \label{fig:accuracy-distribution}
+\end{figure}

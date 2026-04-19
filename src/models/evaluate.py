@@ -39,13 +39,27 @@ def summarize_cv_metrics(fold_metrics):
 
     summary = {}
     lines = []
+    n = len(fold_metrics)
+    z_95 = 1.96
+
     for name in metric_names:
         values = np.array([metrics[name] for metrics in fold_metrics], dtype=float)
-        summary[f"{name}_mean"] = float(values.mean())
-        summary[f"{name}_std"] = float(values.std(ddof=0))
-        lines.append(f"{name}: {values.mean():.4f} ± {values.std(ddof=0):.4f}")
+        mean = float(values.mean())
+        std = float(values.std(ddof=0))
+        se = std / np.sqrt(max(n, 1))
+        ci_low = mean - z_95 * se
+        ci_high = mean + z_95 * se
 
-    summary["fold_count"] = len(fold_metrics)
+        summary[f"{name}_mean"] = mean
+        summary[f"{name}_std"] = std
+        summary[f"{name}_ci95_low"] = float(ci_low)
+        summary[f"{name}_ci95_high"] = float(ci_high)
+
+        lines.append(
+            f"{name}: {mean:.4f} ± {std:.4f} (95% CI: [{ci_low:.4f}, {ci_high:.4f}])"
+        )
+
+    summary["fold_count"] = n
     summary["fold_metrics"] = fold_metrics
     summary["report"] = "\n".join(lines)
 

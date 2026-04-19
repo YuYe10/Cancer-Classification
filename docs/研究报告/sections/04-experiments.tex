@@ -1,126 +1,97 @@
 \section{实验设置与结果分析}
 
-\subsection{实验架构与数据分割策略}
+\subsection{实验目标与评估原则}
 
-本研究采用配置文件驱动的实验框架，通过 YAML 配置文件精确定义每个实验的参数空间。主实验分为三个融合策略，分别对应：（1）RNA-only：仅使用转录组数据的单模态基线；（2）Concat：两种模态特征的早期拼接融合；（3）MOFA：基于潜因子分析的晚期融合方法。消融实验则系统性地移除各个关键组件，以评估其在整体性能中的贡献度。
-
-在数据分割方面，我们采用分层随机划分（Stratified Random Split），确保训练集、验证集和测试集中各类别的比例保持一致。这一方法特别重要，因为 TCGA-BRCA 数据中四个亚型的样本数量分布不均（Luminal A 样本最多，Basal-like 样本最少），若采用无差别的随机划分，可能导致某个亚型在测试集中样本数过少，从而影响性能估计的可靠性。
-
-设定训练/验证/测试比例为 60:20:20，确保测试集包含充分的样本量用于可靠的性能评估。所有实验均使用固定的随机种子（\texttt{random\_state=42}），以保证结果的可复现性。
-
-\subsection{特征选择与维度约减策略}
-
-高维小样本（High-Dimensional, Small Sample）问题是多组学分析中的经典挑战。本研究中，原始 RNA-seq 特征数达 20,531，甲基化特征数达 450,000，而样本总数仅 200。在如此巨大的维数差距下，盲目使用全部特征将导致严重过拟合。
-
-我们采用方差-阈值特征筛选法（Variance Thresholding），按如下流程进行：
-
+本节聚焦两个核心问题：
 \begin{enumerate}
-    \item 在训练集上计算每个特征的方差
-    \item 按方差倒序排序，选取 Top K 特征（K 由实验配置指定，通常为 50-500 之间）
-    \item 对验证集和测试集应用相同的特征索引进行投影
+    \item 在当前数据规模下，RNA-only、Concat、MOFA 与 stacking 四类策略的可重复性能分别如何；
+    \item 当评估口径从单次 holdout 提升到严格交叉验证后，模型性能结论是否保持一致。
 \end{enumerate}
 
-关键细节在于第 3 点：特征选择是通过计算训练集上的统计量实现的，然后这个选择被固定地应用于验证和测试数据。这样可以避免数据泄露（Data Leakage），即模型不会"看到"测试集特性而做出过度优化的决策。
+为避免“单次高分”带来的乐观偏差，本文将 \textbf{holdout 结果} 与 \textbf{交叉验证均值$\pm$标准差} 分开报告，不进行混用比较。
 
-\subsection{标准化与归一化}
+\subsection{实验协议与偏倚控制}
 
-特征的数值尺度差异会直接影响基于距离度量的模型（如 SVM）的性能。RNA-seq 的表达量通常在 0-20,000 范围内，而甲基化值的 $\beta$ 值被约束在 [0, 1]。为了公平比较，我们对所有特征进行 Z-score 标准化：
-
-$$x'_{ij} = \frac{x_{ij} - \mu_j}{\sigma_j}$$
-
-其中 $\mu_j$ 和 $\sigma_j$ 分别为第 $j$ 个特征在训练集上的均值和标准差。与特征选择类似，标准化参数也由训练集学习，然后固定地应用于测试集。
-
-\subsection{支持向量机分类器配置}
-
-我们选用 Radial Basis Function（RBF）核的 SVM 作为统一的分类器，而不依赖数据模态或融合方法而改变。这样可以确保任何性能差异都来源于输入特征的质量差异，而非分类器选择的变化。
-
-SVM 的两个关键超参数为：
+本文实验采用配置驱动执行（YAML + 统一入口脚本），主实验通过 \texttt{run\_all.sh} 调度，结果统一落盘到 \texttt{outputs/logs/summary.csv}。评估协议包括：
 \begin{itemize}
-    \item $C$ 正则化参数：控制训练误差与模型复杂度的平衡。$C$ 越大，模型倾向于拟合训练数据；$C$ 越小，模型的规范化约束更强
-    \item $\gamma$ RBF 核参数：控制单个训练样本的影响范围
+    \item \textbf{Holdout 协议}：用于快速对照与回归验证；
+    \item \textbf{CV 协议}：用于稳健评估（以 stacking 配置为代表）。
 \end{itemize}
 
-我们采用网格搜索（Grid Search）在验证集上选择最优的 $(C, \gamma)$ 组合。搜索空间为 $C \in \{10^{-2}, 10^{-1}, \ldots, 10^{3}\}$ 和 $\gamma \in \{\text{scale}, \text{auto}\}$。所有超参数优化都在训练+验证集上进行，与测试集保持完全分离。
+针对多组学高维小样本场景中的典型偏倚，工程实现中做了三项关键约束：
+\begin{enumerate}
+    \item \textbf{稀有类处理}：当类别样本数小于 2 时自动剔除并记录（本实验中为 HER2）；
+    \item \textbf{预处理一致性}：特征筛选与标准化严格按训练统计量执行，并在测试阶段复用同一特征顺序与填补统计；
+    \item \textbf{融合概率对齐}：stacking 中各折概率列按标签空间对齐，避免元特征错位。
+\end{enumerate}
 
-\subsection{多组学融合方法详述}
+\subsection{对比方法与消融设置}
 
-\subsubsection{RNA-only 基线}
-RNA-only 融合方法仅使用 RNA-seq 表达数据，代表当前临床界普遍采用的单模态分型标准（PAM50 基因集）。虽然 PAM50 在临床中应用广泛，但它通常需要人工选择 50 个先验基因，而我们的方法采用完全数据驱动的方式，让分类器从 20,531 维 RNA 特征中自动选择最有用的信息。
-
-\subsubsection{早期融合：Concatenation}
-Concat 方法在特征层面进行融合，即将 RNA 和甲基化的特征向量直接拼接成一个长向量。设 RNA 特征维数为 $d_R$，甲基化特征维数为 $d_M$，则拼接后的特征维数为 $d_R + d_M$。这种方法的优点是实现简单、易于解释，且不受模态之间复杂依赖关系的约束；缺点是可能引入模态间的不对称性（如果两个模态的特征重要性分布不同）。
-
-\subsubsection{晚期融合：MOFA}
-MOFA（Multi-Omics Factor Analysis）是一种概率模型，通过学习每个样本在潜因子空间中的投影向量，同时捕获模态内共享和模态特有的因子结构。其基本模型为：
-
-$$X_m = W_m Z + \varepsilon_m$$
-
-其中 $X_m$ 为第 $m$ 个模态的数据矩阵（样本 × 特征），$Z$ 为共享的潜因子矩阵（样本 × 因子），$W_m$ 为模态-特有的加载矩阵，$\varepsilon_m$ 为噪声。
-
-MOFA 的推断通过变分推断（Variational Inference）实现，我们使用 mofapy2 包中的默认参数进行训练。关键参数包括：
+本文比较四种模型线：
 \begin{itemize}
-    \item 因子数：通常设为 10-15，用来平衡模型表达能力与防止过拟合
-    \item 迭代次数：最大 1000 次迭代或收敛时停止
-    \item 初始化方案：采用 PCA 初始化以加速收敛
+    \item \textbf{RNA-only}：单模态基线；
+    \item \textbf{Concat}：RNA 与甲基化特征早期拼接；
+    \item \textbf{MOFA}：潜因子表示后分类；
+    \item \textbf{Stacking}：基于跨模态概率元特征的晚期融合。
 \end{itemize}
 
-MOFA 训练完毕后，我们提取每个样本的因子投影向量（维度 = 因子数），这个低维表示被用作 SVM 的输入。
+消融实验包括：去甲基化、去 RNA、不做特征选择。其目标是验证“模态互补性”和“特征工程必要性”是否成立。
 
-\subsection{评估指标与统计检验}
+\subsection{评估指标与报告规范}
 
-我们采用以下多个指标全面评估模型性能，而非仅依赖单一的准确率：
+本文采用 Accuracy、Balanced Accuracy、Macro-F1、Weighted-F1、Macro-Precision、Macro-Recall 六项指标。针对不平衡多分类任务，Balanced Accuracy 与 Macro-F1 被作为主要判读指标。
 
+其中，CV 结果按如下形式报告：
+$$\mu \pm \sigma$$
+其中 $\mu$ 为各折均值，$\sigma$ 为各折标准差。该写法用于刻画性能中心与波动范围，优于仅报告单点结果。
+
+\subsection{主实验结果（与日志一致）}
+
+表 \ref{tab:method-comparison} 汇总了当前可复现的严格 CV 结果（基于日志自动生成）。
+
+\input{../../outputs/logs/method_comparison.tex}
+
+从结果看，RNA-only 与 stacking 在点估计上存在一定差异，但统计检验显示该差异不显著（$p=0.639218$）。因此，在当前样本规模下，不宜得出“某方法显著优于另一方法”的强结论。
+
+作为对照，holdout 口径下 RNA-only、Concat、MOFA 出现同分现象（Accuracy=0.875）。这一现象与测试样本规模偏小有关，进一步说明主结论应优先基于重复交叉验证口径。
+
+\subsection{关键可视化结果}
+
+图 \ref{fig:exp_accuracy_ci} 与图 \ref{fig:exp_accuracy_dist} 分别展示了均值与95\%置信区间、以及 fold-level 分布。两图共同用于评估“性能中心 + 波动范围 + 分布重叠”。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\linewidth]{../../outputs/figures/statistical_accuracy_ci.png}
+\caption{RNA-only 与 Stacking 的准确率均值及95\%置信区间对比。}
+\label{fig:exp_accuracy_ci}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\linewidth]{../../outputs/figures/statistical_accuracy_distribution.png}
+\caption{RNA-only 与 Stacking 在各fold上的准确率分布（箱线图）。}
+\label{fig:exp_accuracy_dist}
+\end{figure}
+
+\subsection{消融实验结论（定性稳健）}
+
+消融实验给出两条稳定结论：
+\begin{enumerate}
+    \item 去任一模态都会削弱融合信息完整性；
+    \item 取消特征选择会显著放大高维噪声并导致性能退化。
+\end{enumerate}
+
+因此，当前管线中的“模态融合 + 特征筛选”并非可选增强，而是保证可用性能的必要设计。
+
+\subsection{面向期刊标准的结果解释}
+
+与国内顶尖期刊对实验部分的要求对齐，本文强调以下三点：
 \begin{itemize}
-    \item \textbf{Accuracy（准确率）}：$\text{Acc} = \frac{TP + TN}{TP + TN + FP + FN}$
-    \item \textbf{Precision（精确率）}：$\text{Prec} = \frac{TP}{TP + FP}$，表示预测为正的样本中真正为正的比例
-    \item \textbf{Recall（召回率）}：$\text{Recall} = \frac{TP}{TP + FN}$，表示真正正样本中被正确识别的比例
-    \item \textbf{F1-Score}：$F1 = 2 \cdot \frac{\text{Prec} \cdot \text{Recall}}{\text{Prec} + \text{Recall}}$，精确率与召回率的调和平均
-    \item \textbf{AUC-ROC}：曲线下面积（Area Under the Receiver Operating Characteristic Curve），衡量模型区分能力的鲁棒指标
+    \item \textbf{真实性优先}：仅报告实际运行日志中的数值，不使用推测性指标替代；
+    \item \textbf{口径一致性}：holdout 与 CV 分开解读，避免不当横向比较；
+    \item \textbf{不确定性显式化}：通过标准差报告模型稳定性，避免“单次最优”叙事。
 \end{itemize}
 
-对于多分类问题（四个亚型），我们采用宏平均（Macro-averaging）和微平均（Micro-averaging）两种策略：
-\begin{itemize}
-    \item \textbf{Macro}：先在各类别上单独计算指标，再求平均，对低频类别更敏感
-    \item \textbf{Micro}：按样本计算总体的混淆矩阵元素，再求指标，对高频类别更敏感
-\end{itemize}
+\subsection{与目标性能的差距}
 
-\subsection{消融实验设计}
-
-消融实验通过有控制地移除关键组件，定量评估每个部分的贡献。我们设计了三组消融：
-
-\textbf{消融 1：去甲基化（No Methylation）} 
-在 Concat 融合框架中，仅保留 RNA 特征，移除甲基化特征。这个实验回答了"甲基化信息是否必要"的问题。如果性能不下降，说明在当前特征筛选条件下，甲基化所提供的补充信息有限；反之则说明多模态融合确实产生了互补效应。
-
-\textbf{消融 2：去 RNA（No RNA）}
-类似地，仅保留甲基化特征，移除 RNA 特征。这使我们能够量化两种模态相对重要性的差异。
-
-\textbf{消融 3：不做特征选择（No Feature Selection）}
-在未进行任何特征筛选的情况下，将全部 20,531 维 RNA 特征和全部 450,000 维甲基化特征拼接输入 SVM。这个激进的实验将直观展示维度诅咒的危害，以及特征选择在当前问题中的关键地位。
-
-\subsection{主实验结果总结}
-
-根据当前实现的运行结果，主实验的性能排序为：Concat > RNA-only ≈ MOFA。这一排序具有以下几层含义：
-
-首先，Concat 方法在当前设置下取得了最佳性能，说明两模态特征的简单拼接在充分的特征选择后，能够获得强有力的表示。这反映了两种组学模态在表现乳腺癌亚型分化时的互补性。
-
-其次，RNA-only 与 MOFA 的性能接近，这并不意味着 MOFA 无效，而更可能反映了以下事实：（1）MOFA 对因子数、样本规模等超参数较为敏感；（2）当前样本规模（200 样本）对于可靠地学习 10+ 个共享和模态特有的潜因子可能不充分；（3）MOFA 的优势在更大规模、更复杂的多模态场景中更易显现。
-
-\subsection{消融实验结果与解释}
-
-消融实验的结果强有力地支持了我们的多组学融合假设：
-
-在"去甲基化"和"去 RNA"两个消融中，单一模态的性能虽然仍可接受，但相比完整的融合方案有明显下降。这说明甲基化和 RNA 两种数据源都贡献了有价值的判别信息，在表观遗传层面和转录层面形成了互补。
-
-最为显著的结果来自"不做特征选择"消融：性能从 0.88 急剧下降至 0.25，说明在 450,000+ 维的特征空间中，SVM 分类器完全被高维噪声淹没，无法学到有效的判别边界。这一现象从反面强有力地印证了特征筛选的必要性，也说明在高维小样本设置中，特征工程的质量往往比模型复杂度更重要。
-
-\subsection{结果的科学解释与适用范围}
-
-当前实验结果应当置于以下背景中理解：
-
-（1）\textbf{样本规模的局限性}：200 个样本对于四分类任务而言是中等规模。这意味着每个类别平均仅 50 个样本，留给过拟合的余地很大。因此，结果的可泛化性需要在更大数据集上验证。
-
-（2）\textbf{特征筛选的关键性}：当前 50-200 维的特征筛选阈值是通过经验设定的。理想情况下，应通过交叉验证在验证集上自动搜索最优阈值，而不是固定值。
-
-（3）\textbf{方法的互补而非竞争}：虽然 Concat 在当前实验中表现最好，但这不意味着 MOFA 或其他融合方法在更复杂的医学场景中必然劣势。不同融合策略的选择应结合具体应用需求：Concat 更快更简洁，适合实时诊断系统；MOFA 更可解释，适合生物发现研究。
-
-（4）\textbf{临床转化的考虑}：从预测性能向临床应用的转化需要考虑更多因素，包括成本、可检测性、稳健性和可解释性，而非单纯的准确率数值。
+当前实验尚未达到 ACC $\geq 0.95$。阈值监控结果显示命中数为 0。该差距说明：在现有样本量与标签分布条件下，若要冲击更高指标，必须依赖更系统的超参数搜索、重复交叉验证和外部验证集，而不能依靠单次切分“碰运气”。

@@ -50,16 +50,28 @@ def _to_scalar_row(config_path, tag_name, run_timestamp, metrics_dict):
         "macro_recall": metrics_dict.get("macro_recall"),
         "accuracy_mean": metrics_dict.get("accuracy_mean"),
         "accuracy_std": metrics_dict.get("accuracy_std"),
+        "accuracy_ci95_low": metrics_dict.get("accuracy_ci95_low"),
+        "accuracy_ci95_high": metrics_dict.get("accuracy_ci95_high"),
         "balanced_accuracy_mean": metrics_dict.get("balanced_accuracy_mean"),
         "balanced_accuracy_std": metrics_dict.get("balanced_accuracy_std"),
+        "balanced_accuracy_ci95_low": metrics_dict.get("balanced_accuracy_ci95_low"),
+        "balanced_accuracy_ci95_high": metrics_dict.get("balanced_accuracy_ci95_high"),
         "macro_f1_mean": metrics_dict.get("macro_f1_mean"),
         "macro_f1_std": metrics_dict.get("macro_f1_std"),
+        "macro_f1_ci95_low": metrics_dict.get("macro_f1_ci95_low"),
+        "macro_f1_ci95_high": metrics_dict.get("macro_f1_ci95_high"),
         "weighted_f1_mean": metrics_dict.get("weighted_f1_mean"),
         "weighted_f1_std": metrics_dict.get("weighted_f1_std"),
+        "weighted_f1_ci95_low": metrics_dict.get("weighted_f1_ci95_low"),
+        "weighted_f1_ci95_high": metrics_dict.get("weighted_f1_ci95_high"),
         "macro_precision_mean": metrics_dict.get("macro_precision_mean"),
         "macro_precision_std": metrics_dict.get("macro_precision_std"),
+        "macro_precision_ci95_low": metrics_dict.get("macro_precision_ci95_low"),
+        "macro_precision_ci95_high": metrics_dict.get("macro_precision_ci95_high"),
         "macro_recall_mean": metrics_dict.get("macro_recall_mean"),
         "macro_recall_std": metrics_dict.get("macro_recall_std"),
+        "macro_recall_ci95_low": metrics_dict.get("macro_recall_ci95_low"),
+        "macro_recall_ci95_high": metrics_dict.get("macro_recall_ci95_high"),
         "fold_count": metrics_dict.get("fold_count"),
         "base_model_type": metrics_dict.get("base_model_type"),
         "meta_model_type": metrics_dict.get("meta_model_type"),
@@ -86,14 +98,26 @@ if not args.no_save:
         json.dump(payload, handle, ensure_ascii=False, indent=2)
 
     summary_csv = output_dir / "summary.csv"
+    summary_v2_csv = output_dir / "summary_v2.csv"
     row = _to_scalar_row(args.config, run_tag, timestamp, metrics)
     fieldnames = list(row.keys())
-    write_header = not summary_csv.exists()
-    with open(summary_csv, "a", newline="", encoding="utf-8") as handle:
+
+    target_csv = summary_csv
+    if summary_csv.exists():
+        with open(summary_csv, newline="", encoding="utf-8") as handle:
+            reader = csv.reader(handle)
+            existing_header = next(reader, [])
+        if existing_header and existing_header != fieldnames:
+            target_csv = summary_v2_csv
+
+    write_header = not target_csv.exists()
+    with open(target_csv, "a", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         if write_header:
             writer.writeheader()
         writer.writerow(row)
 
     print("Saved JSON:", json_path)
-    print("Updated CSV:", summary_csv)
+    print("Updated CSV:", target_csv)
+    if target_csv != summary_csv:
+        print("Note: Detected legacy summary.csv schema; wrote to summary_v2.csv for compatibility.")

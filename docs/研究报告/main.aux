@@ -77,80 +77,82 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.5}SVM 分类器}{23}{subsection.6.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.6}分类评价指标}{23}{subsection.6.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {7}实验设置与结果分析}{24}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}实验架构与数据分割策略}{24}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}特征选择与维度约减策略}{24}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}标准化与归一化}{25}{subsection.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}支持向量机分类器配置}{25}{subsection.7.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}多组学融合方法详述}{25}{subsection.7.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.1}RNA-only 基线}{25}{subsubsection.7.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.2}早期融合：Concatenation}{26}{subsubsection.7.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.3}晚期融合：MOFA}{26}{subsubsection.7.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}评估指标与统计检验}{26}{subsection.7.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}消融实验设计}{27}{subsection.7.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.8}主实验结果总结}{27}{subsection.7.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.9}消融实验结果与解释}{28}{subsection.7.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.10}结果的科学解释与适用范围}{28}{subsection.7.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}结果图表与可视化分析}{28}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}主实验结果汇总}{28}{subsection.8.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces 主实验结果汇总\relax }}{29}{table.caption.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}消融实验结果汇总}{29}{subsection.8.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces 消融实验结果汇总\relax }}{29}{table.caption.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}分类报告的类别级差异}{29}{subsection.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}特征重要性分析与排序}{30}{subsection.8.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces 特征重要性排序与模态分布分析。左图为 Top 20 判别特征；右图为 RNA 与甲基化特征的重要性分布对比，表明 RNA 特征整体具有更高的个体判别能力。\relax }}{30}{figure.caption.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}实验目标与评估原则}{24}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}实验协议与偏倚控制}{24}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}对比方法与消融设置}{25}{subsection.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}评估指标与报告规范}{25}{subsection.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}主实验结果（与日志一致）}{25}{subsection.7.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Method Comparison with 95\% Confidence Intervals (repeated 5-fold CV)  Results are reported as mean (95\% CI: [lower--upper]).\relax }}{25}{table.caption.2}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:feature_importance}{{1}{30}{特征重要性排序与模态分布分析。左图为 Top 20 判别特征；右图为 RNA 与甲基化特征的重要性分布对比，表明 RNA 特征整体具有更高的个体判别能力。\relax }{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}交叉验证鲁棒性评估}{30}{subsection.8.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces 5 折交叉验证性能对比。左图显示各方法在每个 fold 上的 accuracy；右图为 boxplot 展示方法的稳定性与离散度，反映泛化能力的一致性。\relax }}{30}{figure.caption.5}\protected@file@percent }
-\newlabel{fig:cv_performance}{{2}{30}{5 折交叉验证性能对比。左图显示各方法在每个 fold 上的 accuracy；右图为 boxplot 展示方法的稳定性与离散度，反映泛化能力的一致性。\relax }{figure.caption.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.6}超参数敏感性与特征数量的影响}{31}{subsection.8.6}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces 超参数敏感性分析。左：SVM 参数 C 的影响；右：特征数量对融合方法性能的影响，显示拼接方法在中等特征数量下达到最优性能。\relax }}{31}{figure.caption.6}\protected@file@percent }
-\newlabel{fig:hyperparameter_sens}{{3}{31}{超参数敏感性分析。左：SVM 参数 C 的影响；右：特征数量对融合方法性能的影响，显示拼接方法在中等特征数量下达到最优性能。\relax }{figure.caption.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.7}亚型特异性 ROC 曲线分析}{31}{subsection.8.7}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces 各乳腺癌分子亚型的 ROC 曲线。不同颜色代表不同亚型，曲线下面积（AUC）表示模型对该亚型的判别能力。Basal-like 亚型通常表现出最高的 AUC，反映其表型特异性最强。\relax }}{32}{figure.caption.7}\protected@file@percent }
-\newlabel{fig:roc_curves}{{4}{32}{各乳腺癌分子亚型的 ROC 曲线。不同颜色代表不同亚型，曲线下面积（AUC）表示模型对该亚型的判别能力。Basal-like 亚型通常表现出最高的 AUC，反映其表型特异性最强。\relax }{figure.caption.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.8}多模态对分类贡献的热力图分析}{32}{subsection.8.8}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces 多模态贡献热力图。色深表示贡献程度，显示 RNA 特征对大多数亚型的贡献较大，而甲基化特征对 Basal-like 类型的贡献相对更突出。\relax }}{33}{figure.caption.8}\protected@file@percent }
-\newlabel{fig:modality_contrib}{{5}{33}{多模态贡献热力图。色深表示贡献程度，显示 RNA 特征对大多数亚型的贡献较大，而甲基化特征对 Basal-like 类型的贡献相对更突出。\relax }{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.9}多随机种子的鲁棒性分析}{33}{subsection.8.9}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces 多种子鲁棒性分析。左：小提琴图显示 25 次运行的准确度分布；右：标准差对比显示 Concat 方法的稳定性最佳。\relax }}{33}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:robustness}{{6}{33}{多种子鲁棒性分析。左：小提琴图显示 25 次运行的准确度分布；右：标准差对比显示 Concat 方法的稳定性最佳。\relax }{figure.caption.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.10}预处理管道的逐步影响}{33}{subsection.8.10}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces 预处理管道对性能的累积影响。从基线的 0.62 逐步提升至 0.88，其中特征选择一步贡献最大，体现了高方差筛选的关键作用。\relax }}{34}{figure.caption.10}\protected@file@percent }
-\newlabel{fig:preprocessing_impact}{{7}{34}{预处理管道对性能的累积影响。从基线的 0.62 逐步提升至 0.88，其中特征选择一步贡献最大，体现了高方差筛选的关键作用。\relax }{figure.caption.10}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.11}泛化间隙分析}{34}{subsection.8.11}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces 泛化间隙随训练集大小的变化。曲线趋势表明在当前数据规模下，训练误差与测试误差之间存在约 0.06-0.08 的差距，提示进一步的样本扩展可能有助于改进泛化能力。\relax }}{34}{figure.caption.11}\protected@file@percent }
-\newlabel{fig:gen_gap}{{8}{34}{泛化间隙随训练集大小的变化。曲线趋势表明在当前数据规模下，训练误差与测试误差之间存在约 0.06-0.08 的差距，提示进一步的样本扩展可能有助于改进泛化能力。\relax }{figure.caption.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.12}综合性能对比与雷达图分析}{35}{subsection.8.12}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces 综合性能对比。左：分组条形图显示各方法在五个关键指标上的表现；右：雷达图提供多维度的直观比较，Concat 方法在大多数指标上领先。\relax }}{35}{figure.caption.12}\protected@file@percent }
-\newlabel{fig:methods_adv}{{9}{35}{综合性能对比。左：分组条形图显示各方法在五个关键指标上的表现；右：雷达图提供多维度的直观比较，Concat 方法在大多数指标上领先。\relax }{figure.caption.12}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.13}对结果的直观理解}{35}{subsection.8.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}工程实现细节}{35}{section.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}项目结构与模块职责}{35}{subsection.9.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}数据加载与标签清洗}{36}{subsection.9.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}样本对齐的实现逻辑}{36}{subsection.9.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}预处理器的工程化封装}{36}{subsection.9.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}MOFA 接口适配}{36}{subsection.9.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.6}实验脚本与配置文件}{37}{subsection.9.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {10}误差分析与敏感性讨论}{37}{section.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.1}类别级别的识别差异}{37}{subsection.10.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.2}特征数量对结果的影响}{37}{subsection.10.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.3}融合策略的敏感性}{38}{subsection.10.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.4}训练测试划分的敏感性}{38}{subsection.10.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.5}错误来源的分类}{38}{subsection.10.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.6}结果稳定性的解释}{39}{subsection.10.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {11}讨论}{39}{section.11}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.1}为什么 Concat 在当前结果中表现较好}{39}{subsection.11.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.2}MOFA 的优势与局限}{39}{subsection.11.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.3}消融实验的意义}{39}{subsection.11.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.4}当前研究的局限性}{40}{subsection.11.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.5}未来可扩展的方向}{40}{subsection.11.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {12}结论}{40}{section.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {13}总结}{41}{section.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {14}写作与扩写说明}{42}{section.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {14.1}建议的扩写顺序}{42}{subsection.14.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {14.2}与当前仓库实现的对应关系}{42}{subsection.14.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {14.3}后续可继续加入的内容}{42}{subsection.14.3}\protected@file@percent }
+\newlabel{tab:method-comparison}{{1}{25}{Method Comparison with 95\% Confidence Intervals (repeated 5-fold CV)\\ Results are reported as mean (95\% CI: [lower--upper]).\relax }{table.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}关键可视化结果}{26}{subsection.7.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces RNA-only 与 Stacking 的准确率均值及95\%置信区间对比。\relax }}{26}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:exp_accuracy_ci}{{1}{26}{RNA-only 与 Stacking 的准确率均值及95\%置信区间对比。\relax }{figure.caption.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces RNA-only 与 Stacking 在各fold上的准确率分布（箱线图）。\relax }}{26}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:exp_accuracy_dist}{{2}{26}{RNA-only 与 Stacking 在各fold上的准确率分布（箱线图）。\relax }{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}消融实验结论（定性稳健）}{26}{subsection.7.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.8}面向期刊标准的结果解释}{27}{subsection.7.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.9}与目标性能的差距}{27}{subsection.7.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.10}评估框架与统计方法}{27}{subsection.7.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.10.1}交叉验证设计}{27}{subsubsection.7.10.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.10.2}置信区间计算}{28}{subsubsection.7.10.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.10.3}显著性检验}{28}{subsubsection.7.10.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.11}主要结果}{28}{subsection.7.11}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Method Comparison with 95\% Confidence Intervals (repeated 5-fold CV)  Results are reported as mean (95\% CI: [lower--upper]).\relax }}{29}{table.caption.5}\protected@file@percent }
+\newlabel{tab:method-comparison}{{2}{29}{Method Comparison with 95\% Confidence Intervals (repeated 5-fold CV)\\ Results are reported as mean (95\% CI: [lower--upper]).\relax }{table.caption.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.11.1}关键发现}{29}{subsubsection.7.11.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{1. 多组学融合的边际收益有限}{29}{paragraph*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{2. 不确定性的量化}{29}{paragraph*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{3. 改进相比旧的holdout设计}{29}{paragraph*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.11.2}性能指标对比}{29}{subsubsection.7.11.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.12}可视化}{29}{subsection.7.12}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces 不同方法的准确率与95\%置信区间对比。柱高表示均值，误差条表示置信区间。\relax }}{30}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:accuracy-ci}{{3}{30}{不同方法的准确率与95\%置信区间对比。柱高表示均值，误差条表示置信区间。\relax }{figure.caption.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces 不同方法fold-level准确率的分布。箱线图展示了中位数、四分位数范围与离群值。\relax }}{30}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:accuracy-distribution}{{4}{30}{不同方法fold-level准确率的分布。箱线图展示了中位数、四分位数范围与离群值。\relax }{figure.caption.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}结果图表与可视化分析}{30}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}主实验结果汇总}{30}{subsection.8.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces 主实验结果汇总（当前日志版本）\relax }}{31}{table.caption.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}消融实验结果汇总}{31}{subsection.8.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces 消融实验结果汇总\relax }}{31}{table.caption.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}分类报告的类别级差异}{31}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}基于真实日志的核心可视化}{32}{subsection.8.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces 基于真实日志的 holdout 多指标对比图。该图展示各实验在 accuracy、balanced accuracy、macro-F1 与 weighted-F1 上的最新结果。\relax }}{32}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:real_holdout_metrics}{{5}{32}{基于真实日志的 holdout 多指标对比图。该图展示各实验在 accuracy、balanced accuracy、macro-F1 与 weighted-F1 上的最新结果。\relax }{figure.caption.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces 基于真实日志的交叉验证结果（均值$\pm $标准差）。该图用于直观比较模型性能中心与波动幅度。\relax }}{32}{figure.caption.14}\protected@file@percent }
+\newlabel{fig:real_cv_metrics}{{6}{32}{基于真实日志的交叉验证结果（均值$\pm $标准差）。该图用于直观比较模型性能中心与波动幅度。\relax }{figure.caption.14}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces 实验结果时间线。该图展示不同实验在不同时间点的性能变化，用于排查回归问题与版本迭代影响。\relax }}{33}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:real_score_timeline}{{7}{33}{实验结果时间线。该图展示不同实验在不同时间点的性能变化，用于排查回归问题与版本迭代影响。\relax }{figure.caption.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces 与目标准确率（0.95）的差距分析。柱值越接近 0 表示越接近目标，负值表示已超过目标。\relax }}{33}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:real_target_gap}{{8}{33}{与目标准确率（0.95）的差距分析。柱值越接近 0 表示越接近目标，负值表示已超过目标。\relax }{figure.caption.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}图表证据链解释}{33}{subsection.8.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.6}模板图与扩展分析说明}{34}{subsection.8.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}工程实现细节}{34}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}项目结构与模块职责}{34}{subsection.9.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}数据加载与标签清洗}{34}{subsection.9.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}样本对齐的实现逻辑}{34}{subsection.9.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}预处理器的工程化封装}{35}{subsection.9.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}MOFA 接口适配}{35}{subsection.9.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.6}实验脚本与配置文件}{35}{subsection.9.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {10}误差分析与敏感性讨论}{36}{section.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.1}类别级别的识别差异}{36}{subsection.10.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.2}特征数量对结果的影响}{36}{subsection.10.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.3}融合策略的敏感性}{36}{subsection.10.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.4}训练测试划分的敏感性}{36}{subsection.10.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.5}错误来源的分类}{37}{subsection.10.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.6}结果稳定性的解释}{37}{subsection.10.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {11}讨论}{37}{section.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.1}证据分级：当前结果可以支撑什么结论}{37}{subsection.11.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.2}MOFA 的优势与局限}{38}{subsection.11.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.3}消融实验的意义}{38}{subsection.11.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.4}当前研究的局限性}{38}{subsection.11.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.5}面向期刊投稿的下一步路线}{38}{subsection.11.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {12}结论}{39}{section.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {13}总结}{39}{section.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {14}研究总结与质量清单}{40}{section.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.1}本文已达到的完成度}{40}{subsection.14.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.2}对齐顶尖期刊的质量清单}{40}{subsection.14.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.3}下一阶段优先级}{40}{subsection.14.3}\protected@file@percent }
 \bibcite{tcga2013}{1}
 \bibcite{xena2017}{2}
 \bibcite{pam50}{3}
@@ -159,6 +161,6 @@
 \bibcite{shap2017}{6}
 \bibcite{mogonet2021}{7}
 \bibcite{aebersold2018}{8}
-\@writefile{toc}{\contentsline {subsection}{\numberline {14.4}当前版本定位}{43}{subsection.14.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {15}参考文献}{43}{section.15}\protected@file@percent }
-\gdef \@abspage@last{51}
+\@writefile{toc}{\contentsline {subsection}{\numberline {14.4}本稿定位}{41}{subsection.14.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {15}参考文献}{41}{section.15}\protected@file@percent }
+\gdef \@abspage@last{49}
