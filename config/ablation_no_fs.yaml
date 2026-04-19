@@ -17,6 +17,11 @@ model:
   test_size: 0.2
   random_state: 42
 
+evaluation:
+  mode: holdout
+  folds: 5
+  repeats: 3
+
 mofa:
   factors: 20
 

@@ -1,4 +1,4 @@
-exp: mofa
+exp: stacking
 
 data:
   rna_path: datasets/TCGA-BRCA.star_counts.csv
@@ -10,11 +10,22 @@ preprocess:
   meth_top_var: 2000
 
 model:
+  type: xgboost
   test_size: 0.2
   random_state: 42
+  xgb_n_estimators: 400
+  xgb_max_depth: 4
+  xgb_learning_rate: 0.03
+  xgb_subsample: 0.9
+  xgb_colsample_bytree: 0.9
+
+stacking:
+  base_model_type: xgboost
+  meta_model_type: xgboost
+  meta_cv_splits: 5
 
 evaluation:
-  mode: holdout
+  mode: repeated_cv
   folds: 5
   repeats: 3
 

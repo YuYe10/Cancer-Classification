@@ -1,0 +1,37 @@
+exp: stacking
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 3000
+  meth_top_var: 3000
+
+model:
+  type: xgboost
+  test_size: 0.2
+  random_state: 42
+  n_jobs: -1
+  xgb_n_estimators: 900
+  xgb_max_depth: 6
+  xgb_learning_rate: 0.02
+  xgb_subsample: 0.9
+  xgb_colsample_bytree: 0.8
+  xgb_reg_lambda: 1.2
+  xgb_min_child_weight: 1.0
+  xgb_tree_method: hist
+
+stacking:
+  base_model_type: xgboost
+  meta_model_type: xgboost
+  meta_cv_splits: 5
+
+evaluation:
+  mode: repeated_cv
+  folds: 5
+  repeats: 5
+
+mofa:
+  factors: 20
