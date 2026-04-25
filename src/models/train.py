@@ -33,9 +33,10 @@ def train_svm(X_train, y_train, config):
     model_cfg = config.get('model', {})
     model = SVC(
         C=model_cfg.get('svm_c', 1.0),
-        kernel=model_cfg.get('svm_kernel', 'rbf'),
-        probability=True,
+        kernel=model_cfg.get('svm_kernel', 'linear'),
+        probability=model_cfg.get('svm_probability', False),
         random_state=model_cfg.get('random_state', 42),
+        class_weight=model_cfg.get('svm_class_weight', None),
     )
     model.fit(X_train, y_train)
     return model

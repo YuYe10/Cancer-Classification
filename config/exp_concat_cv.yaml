@@ -6,18 +6,13 @@ data:
   clinical_path: datasets/brca_pam50.csv
 
 preprocess:
-  rna_top_var: 2000
-  meth_top_var: 2000
+  rna_top_var: 500
+  meth_top_var: 500
 
 model:
-  type: xgboost
+  type: svm
   test_size: 0.2
   random_state: 42
-  xgb_n_estimators: 500
-  xgb_max_depth: 4
-  xgb_learning_rate: 0.03
-  xgb_subsample: 0.9
-  xgb_colsample_bytree: 0.9
 
 evaluation:
   mode: repeated_cv

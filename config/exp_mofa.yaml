@@ -6,15 +6,16 @@ data:
   clinical_path: datasets/brca_pam50.csv
 
 preprocess:
-  rna_top_var: 2000
-  meth_top_var: 2000
+  rna_top_var: 500
+  meth_top_var: 500
 
 model:
+  type: svm
   test_size: 0.2
   random_state: 42
 
 evaluation:
-  mode: holdout
+  mode: repeated_cv
   folds: 5
   repeats: 3
 

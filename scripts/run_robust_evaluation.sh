@@ -25,16 +25,16 @@ TAG="robust_eval_$(date +%Y%m%d_%H%M%S)"
 
 run_exp "config/exp_rna_cv.yaml" "$TAG"
 run_exp "config/exp_concat_cv.yaml" "$TAG"
-run_exp "config/exp_concat_rf_cv.yaml" "$TAG"
+run_exp "config/exp_mofa.yaml" "$TAG"
 run_exp "config/exp_stacking.yaml" "$TAG"
 
 LATEST_RNA=$(ls -t outputs/logs/exp_rna_cv_${TAG}_*.json 2>/dev/null | head -n1 || true)
 LATEST_CONCAT=$(ls -t outputs/logs/exp_concat_cv_${TAG}_*.json 2>/dev/null | head -n1 || true)
-LATEST_RF=$(ls -t outputs/logs/exp_concat_rf_cv_${TAG}_*.json 2>/dev/null | head -n1 || true)
+LATEST_MOFA=$(ls -t outputs/logs/exp_mofa_${TAG}_*.json 2>/dev/null | head -n1 || true)
 LATEST_STACK=$(ls -t outputs/logs/exp_stacking_${TAG}_*.json 2>/dev/null | head -n1 || true)
 
 FILES=()
-for f in "$LATEST_RNA" "$LATEST_CONCAT" "$LATEST_RF" "$LATEST_STACK"; do
+for f in "$LATEST_RNA" "$LATEST_CONCAT" "$LATEST_MOFA" "$LATEST_STACK"; do
   if [[ -n "$f" ]]; then
     FILES+=("$f")
   fi

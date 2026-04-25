@@ -1,97 +1,59 @@
-\section{实验设置与结果分析}
+\section{实验设置}
 
-\subsection{实验目标与评估原则}
+\subsection{实验目标}
 
-本节聚焦两个核心问题：
+本节关注两个问题：
+
 \begin{enumerate}
-    \item 在当前数据规模下，RNA-only、Concat、MOFA 与 stacking 四类策略的可重复性能分别如何；
-    \item 当评估口径从单次 holdout 提升到严格交叉验证后，模型性能结论是否保持一致。
+    \item 四种方法在严格一致评估口径下的准确率差异；
+    \item 性能变化是否与融合机制预期一致。
 \end{enumerate}
 
-为避免“单次高分”带来的乐观偏差，本文将 \textbf{holdout 结果} 与 \textbf{交叉验证均值$\pm$标准差} 分开报告，不进行混用比较。
+\subsection{数据与任务}
 
-\subsection{实验协议与偏倚控制}
+实验使用 TCGA-BRCA 的 RNA、甲基化和临床标签数据。任务定义为分子亚型多分类，标签空间为 LumA、LumB、HER2、Basal。对于样本数不足的类别，系统在训练前自动记录并剔除，避免无效分层。
 
-本文实验采用配置驱动执行（YAML + 统一入口脚本），主实验通过 \texttt{run\_all.sh} 调度，结果统一落盘到 \texttt{outputs/logs/summary.csv}。评估协议包括：
+\subsection{评估协议}
+
+主结果统一使用 repeated stratified cross-validation：
+
 \begin{itemize}
-    \item \textbf{Holdout 协议}：用于快速对照与回归验证；
-    \item \textbf{CV 协议}：用于稳健评估（以 stacking 配置为代表）。
+    \item folds = 5
+    \item repeats = 3
+    \item 总测试折数 = 15
 \end{itemize}
 
-针对多组学高维小样本场景中的典型偏倚，工程实现中做了三项关键约束：
+该协议替代单次切分作为主结论依据，以降低偶然划分导致的结果波动。
+
+\subsection{指标与统计}
+
+报告指标包括：
+
+\begin{itemize}
+    \item Accuracy
+    \item Balanced Accuracy
+    \item Macro-F1
+\end{itemize}
+
+每个指标均报告均值、标准差和95\%置信区间。必要时使用置换检验比较方法间差异显著性。
+
+\subsection{实现入口}
+
+主线实验入口如下：
+
+\begin{itemize}
+    \item run\_all.sh：四方法主线一键运行；
+    \item scripts/run\_strict\_cv.sh：严格 CV 批处理；
+    \item scripts/run\_robust\_evaluation.sh：主线 + 统计比较。
+\end{itemize}
+
+\subsection{结果解释原则}
+
+结果解释遵循两条原则：
+
 \begin{enumerate}
-    \item \textbf{稀有类处理}：当类别样本数小于 2 时自动剔除并记录（本实验中为 HER2）；
-    \item \textbf{预处理一致性}：特征筛选与标准化严格按训练统计量执行，并在测试阶段复用同一特征顺序与填补统计；
-    \item \textbf{融合概率对齐}：stacking 中各折概率列按标签空间对齐，避免元特征错位。
+    \item 同口径比较优先于单次高分；
+    \item 统计稳定性优先于个别折最优值。
 \end{enumerate}
 
-\subsection{对比方法与消融设置}
-
-本文比较四种模型线：
-\begin{itemize}
-    \item \textbf{RNA-only}：单模态基线；
-    \item \textbf{Concat}：RNA 与甲基化特征早期拼接；
-    \item \textbf{MOFA}：潜因子表示后分类；
-    \item \textbf{Stacking}：基于跨模态概率元特征的晚期融合。
-\end{itemize}
-
-消融实验包括：去甲基化、去 RNA、不做特征选择。其目标是验证“模态互补性”和“特征工程必要性”是否成立。
-
-\subsection{评估指标与报告规范}
-
-本文采用 Accuracy、Balanced Accuracy、Macro-F1、Weighted-F1、Macro-Precision、Macro-Recall 六项指标。针对不平衡多分类任务，Balanced Accuracy 与 Macro-F1 被作为主要判读指标。
-
-其中，CV 结果按如下形式报告：
-$$\mu \pm \sigma$$
-其中 $\mu$ 为各折均值，$\sigma$ 为各折标准差。该写法用于刻画性能中心与波动范围，优于仅报告单点结果。
-
-\subsection{主实验结果（与日志一致）}
-
-表 \ref{tab:method-comparison} 汇总了当前可复现的严格 CV 结果（基于日志自动生成）。
-
-\input{../../outputs/logs/method_comparison.tex}
-
-从结果看，RNA-only 与 stacking 在点估计上存在一定差异，但统计检验显示该差异不显著（$p=0.639218$）。因此，在当前样本规模下，不宜得出“某方法显著优于另一方法”的强结论。
-
-作为对照，holdout 口径下 RNA-only、Concat、MOFA 出现同分现象（Accuracy=0.875）。这一现象与测试样本规模偏小有关，进一步说明主结论应优先基于重复交叉验证口径。
-
-\subsection{关键可视化结果}
-
-图 \ref{fig:exp_accuracy_ci} 与图 \ref{fig:exp_accuracy_dist} 分别展示了均值与95\%置信区间、以及 fold-level 分布。两图共同用于评估“性能中心 + 波动范围 + 分布重叠”。
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.82\linewidth]{../../outputs/figures/statistical_accuracy_ci.png}
-\caption{RNA-only 与 Stacking 的准确率均值及95\%置信区间对比。}
-\label{fig:exp_accuracy_ci}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.82\linewidth]{../../outputs/figures/statistical_accuracy_distribution.png}
-\caption{RNA-only 与 Stacking 在各fold上的准确率分布（箱线图）。}
-\label{fig:exp_accuracy_dist}
-\end{figure}
-
-\subsection{消融实验结论（定性稳健）}
-
-消融实验给出两条稳定结论：
-\begin{enumerate}
-    \item 去任一模态都会削弱融合信息完整性；
-    \item 取消特征选择会显著放大高维噪声并导致性能退化。
-\end{enumerate}
-
-因此，当前管线中的“模态融合 + 特征筛选”并非可选增强，而是保证可用性能的必要设计。
-
-\subsection{面向期刊标准的结果解释}
-
-与国内顶尖期刊对实验部分的要求对齐，本文强调以下三点：
-\begin{itemize}
-    \item \textbf{真实性优先}：仅报告实际运行日志中的数值，不使用推测性指标替代；
-    \item \textbf{口径一致性}：holdout 与 CV 分开解读，避免不当横向比较；
-    \item \textbf{不确定性显式化}：通过标准差报告模型稳定性，避免“单次最优”叙事。
-\end{itemize}
-
-\subsection{与目标性能的差距}
-
-当前实验尚未达到 ACC $\geq 0.95$。阈值监控结果显示命中数为 0。该差距说明：在现有样本量与标签分布条件下，若要冲击更高指标，必须依赖更系统的超参数搜索、重复交叉验证和外部验证集，而不能依靠单次切分“碰运气”。
+因此，正文结论以 repeated CV 的均值与置信区间为主，不依赖单次偶然分数。

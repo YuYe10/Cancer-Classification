@@ -1,9 +1,6 @@
 import pandas as pd
 
 def load_data(config):
-    rna = pd.read_csv(config['data']['rna_path'], index_col=0)
-    meth = pd.read_csv(config['data']['meth_path'], index_col=0)
-
     clinical = pd.read_csv(config['data']['clinical_path'], sep='\t')
     clinical.columns = clinical.columns.str.strip()
 
@@ -18,5 +15,26 @@ def load_data(config):
     clinical['label'] = clinical['label'].replace({'Her2': 'HER2', 'her2': 'HER2'})
     clinical = clinical[clinical['label'].isin(['LumA', 'LumB', 'HER2', 'Basal'])]
     clinical = clinical.drop_duplicates(subset='sample', keep='first').set_index('sample')
+
+    common_samples = clinical.index.tolist()
+
+    rna_header = pd.read_csv(config['data']['rna_path'], nrows=0)
+    meth_header = pd.read_csv(config['data']['meth_path'], nrows=0)
+
+    rna_samples = [sample for sample in rna_header.columns if sample in common_samples]
+    meth_samples = [sample for sample in meth_header.columns if sample in common_samples]
+
+    rna = pd.read_csv(
+        config['data']['rna_path'],
+        index_col=0,
+        usecols=lambda col: col == rna_header.columns[0] or col in rna_samples,
+        low_memory=False,
+    )
+    meth = pd.read_csv(
+        config['data']['meth_path'],
+        index_col=0,
+        usecols=lambda col: col == meth_header.columns[0] or col in meth_samples,
+        low_memory=False,
+    )
 
     return rna, meth, clinical

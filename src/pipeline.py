@@ -5,7 +5,7 @@ import copy
 from src.data.loader import load_data
 from src.data.align import align_samples
 from src.data.preprocess import RNAPreprocessor, MethPreprocessor
-from src.features.mofa import run_mofa
+from src.features.mofa import fit_mofa, project_mofa_latent, run_mofa
 from src.models.train import train_model, train_classifier
 from src.models.evaluate import evaluate, summarize_cv_metrics
 
@@ -254,12 +254,28 @@ def _build_feature_matrices(
         if not (use_rna and use_meth):
             raise ValueError("exp='mofa' requires both use_rna=True and use_meth=True")
         if not allow_mofa_full_fit:
-            raise NotImplementedError(
-                "Strict cross-validation for MOFA is not implemented yet because the current MOFA wrapper lacks a transform API."
+            mofa_model = fit_mofa(
+                X_train_list[0],
+                X_train_list[1],
+                factors=config['mofa']['factors'],
+                seed=config['model']['random_state'],
             )
+            Z_train = np.asarray(mofa_model.model.nodes["Z"].getExpectation())
+            Z_test = project_mofa_latent(
+                mofa_model.model,
+                X_test_list[0],
+                X_test_list[1],
+            )
+            return Z_train, Z_test
+
         rna_combined = np.concatenate([X_train_list[0], X_test_list[0]], axis=0)
         meth_combined = np.concatenate([X_train_list[1], X_test_list[1]], axis=0)
-        Z_all = run_mofa(rna_combined, meth_combined, config['mofa']['factors'])
+        Z_all = run_mofa(
+            rna_combined,
+            meth_combined,
+            factors=config['mofa']['factors'],
+            seed=config['model']['random_state'],
+        )
         n_train = X_train_list[0].shape[0]
         return Z_all[:n_train], Z_all[n_train:]
 
