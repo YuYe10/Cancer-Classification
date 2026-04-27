@@ -9,6 +9,33 @@
     \item 性能变化是否与融合机制预期一致。
 \end{enumerate}
 
+\subsection{课程任务对照}
+
+围绕“单癌种（BRCA）分子亚型分类”任务，我们按作业要求完成了以下工作：
+
+\begin{enumerate}
+    \item \textbf{数据层面}：整合转录组、甲基化组和临床标签，完成样本对齐与标签标准化；
+    \item \textbf{算法层面}：实现并统一比较 RNA-only、Concat、MOFA、Stacking 四类方法；
+    \item \textbf{评估层面}：报告 Accuracy、Balanced Accuracy、Macro-F1 及 95\% CI，并补充置换检验；
+    \item \textbf{报告层面}：形成“问题-方法-结果-讨论-结论”的完整证据链。
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\caption{课程任务要求与当前完成度审计}
+\label{tab:course-audit}
+\begin{tabular}{p{0.25\linewidth}p{0.28\linewidth}p{0.35\linewidth}}
+\toprule
+课程要求 & 当前完成情况 & 仍需补强 \\
+\midrule
+单癌种分子亚型分类任务定义 & 已完成 BRCA 亚型分类主线，标签对齐后自动过滤稀有类 & 继续补充 HER2 相关样本或外部队列，恢复完整四分类验证 \\
+多组学与算法比较 & 已完成 RNA-only / Concat / MOFA / Stacking 统一比较 & 扩展参数搜索与模态贡献分析，提升结论可解释性 \\
+分类评估与统计 & 已完成 repeated CV、95\% CI、置换检验 & 提升统计功效（更多重采样/外部验证），增强显著性证据 \\
+小组研究报告闭环 & 已形成可编译论文与主结果图表 & 强化“生物学机制 + 失败案例 + 改进路线”三类证据深度 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{数据与任务}
 
 实验使用 TCGA-BRCA 的 RNA、甲基化和临床标签数据。任务定义为分子亚型多分类，标签空间为 LumA、LumB、HER2、Basal。对于样本数不足的类别，系统在训练前自动记录并剔除，避免无效分层。
@@ -37,6 +64,16 @@
 
 每个指标均报告均值、标准差和95\%置信区间。必要时使用置换检验比较方法间差异显著性。
 
+\subsection{为什么统一使用线性 SVM}
+
+本研究将分类器统一为线性 SVM，主要出于三点考虑：
+
+\begin{enumerate}
+    \item 在当前 $n\ll p$（样本远小于特征）条件下，线性模型更稳健，能降低过拟合风险；
+    \item 统一分类器可减少干扰变量，使性能差异主要来自融合机制本身；
+    \item 线性 SVM 的决策边界与特征贡献更容易解释，便于课程报告中的方法分析与结论复核。
+\end{enumerate}
+
 \subsection{实现入口}
 
 主线实验入口如下：
@@ -45,6 +82,16 @@
     \item run\_all.sh：四方法主线一键运行；
     \item scripts/run\_strict\_cv.sh：严格 CV 批处理；
     \item scripts/run\_robust\_evaluation.sh：主线 + 统计比较。
+\end{itemize}
+
+本报告主结果对应最近一次稳健评估批次：
+\texttt{robust\_eval\_20260426\_163214}。
+
+为避免“正文抄数”导致的不一致，主结果均由脚本自动导出到统一产物：
+\begin{itemize}
+    \item \texttt{outputs/logs/method\_comparison\_table.md/.tex}
+    \item \texttt{outputs/logs/class\_error\_analysis.csv/.md}
+    \item \texttt{outputs/figures/statistical\_*.png}
 \end{itemize}
 
 \subsection{结果解释原则}

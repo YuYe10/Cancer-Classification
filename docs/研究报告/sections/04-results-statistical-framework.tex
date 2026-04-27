@@ -30,4 +30,24 @@
 
 \subsection{显著性检验说明}
 
-当需要比较相邻方法是否存在稳定差异时，本文采用置换检验作为补充分析工具。该检验不依赖正态分布假设，适合小样本、多折结果的比较场景。
+当需要比较相邻方法是否存在稳定差异时，我们采用基于 fold-level Accuracy 的双侧置换检验（20,000 次置换）作为补充分析工具。该检验不依赖正态分布假设，适合小样本、多折结果场景。
+
+\begin{table}[H]
+\centering
+\caption{四方法两两置换检验结果（Accuracy）}
+\label{tab:permtest-main}
+\begin{tabular}{lcc}
+\toprule
+方法对比 & $|\Delta \text{mean}|$ & p-value \\
+\midrule
+RNA vs Concat & 0.0357 & 0.2767 \\
+RNA vs MOFA & 0.0798 & 0.2324 \\
+RNA vs Stacking & 0.0167 & 0.6848 \\
+Concat vs MOFA & 0.1155 & 0.0747 \\
+Concat vs Stacking & 0.0524 & 0.1499 \\
+MOFA vs Stacking & 0.0631 & 0.3583 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+从当前样本规模看，虽然 Concat 在均值上领先，但统计显著性尚不充分。我们据此把“稳定趋势”和“区间重叠关系”作为主结论依据。

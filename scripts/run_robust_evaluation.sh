@@ -46,7 +46,49 @@ if [[ ${#FILES[@]} -ge 2 ]]; then
     --files "${FILES[@]}" \
     --metric accuracy \
     --out-md outputs/logs/statistical_evaluation.md
+  PYTHONPATH=. "$PYTHON_BIN" scripts/statistical_evaluation.py \
+    --files "${FILES[@]}" \
+    --metric balanced_accuracy \
+    --out-md outputs/logs/statistical_evaluation_balanced_accuracy.md
+  PYTHONPATH=. "$PYTHON_BIN" scripts/statistical_evaluation.py \
+    --files "${FILES[@]}" \
+    --metric macro_f1 \
+    --out-md outputs/logs/statistical_evaluation_macro_f1.md
+
+  echo "Generating publication plots..."
+  PYTHONPATH=. "$PYTHON_BIN" scripts/generate_statistical_plots.py \
+    --files "${FILES[@]}" \
+    --metric accuracy \
+    --out-dir outputs/figures
+  PYTHONPATH=. "$PYTHON_BIN" scripts/generate_statistical_plots.py \
+    --files "${FILES[@]}" \
+    --metric balanced_accuracy \
+    --out-dir outputs/figures
+  PYTHONPATH=. "$PYTHON_BIN" scripts/generate_statistical_plots.py \
+    --files "${FILES[@]}" \
+    --metric macro_f1 \
+    --out-dir outputs/figures
+
+  echo "Generating comparison tables and class-level error analysis..."
+  PYTHONPATH=. "$PYTHON_BIN" scripts/generate_comparison_tables.py \
+    --files "${FILES[@]}" \
+    --metrics accuracy balanced_accuracy macro_f1 \
+    --stats-md outputs/logs/statistical_evaluation.md \
+    --baseline-method rna \
+    --out-latex outputs/logs/method_comparison_table.tex \
+    --out-md outputs/logs/method_comparison_table.md
+  PYTHONPATH=. "$PYTHON_BIN" scripts/generate_class_error_analysis.py \
+    --files "${FILES[@]}" \
+    --out-csv outputs/logs/class_error_analysis.csv \
+    --out-md outputs/logs/class_error_analysis.md
+
   echo "Saved: outputs/logs/statistical_evaluation.md"
+  echo "Saved: outputs/logs/statistical_evaluation_balanced_accuracy.md"
+  echo "Saved: outputs/logs/statistical_evaluation_macro_f1.md"
+  echo "Saved: outputs/logs/method_comparison_table.tex"
+  echo "Saved: outputs/logs/method_comparison_table.md"
+  echo "Saved: outputs/logs/class_error_analysis.csv"
+  echo "Saved: outputs/logs/class_error_analysis.md"
 else
   echo "Skip statistical comparison: not enough CV result files found."
 fi

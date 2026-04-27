@@ -11,7 +11,7 @@ from typing import Dict, List, Tuple
 
 def load_cv_json(filepath: str) -> dict:
     """Load CV results from JSON file."""
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def extract_method_info(cv_data: dict) -> Tuple[str, str]:
@@ -25,6 +25,8 @@ def extract_method_info(cv_data: dict) -> Tuple[str, str]:
         method = config_path.split('/')[-1].replace('.yaml', '')
     else:
         method = exp_type
+
+    method = canonical_method_name(method)
     
     return method, config_path
 
@@ -289,7 +291,7 @@ def main():
     if args.out_latex:
         latex_table = generate_latex_table(df, args.metrics, pvalue_map, args.baseline_method)
         Path(args.out_latex).parent.mkdir(parents=True, exist_ok=True)
-        with open(args.out_latex, 'w') as f:
+        with open(args.out_latex, 'w', encoding='utf-8') as f:
             f.write(latex_table)
         print(f"\n✓ LaTeX table saved: {args.out_latex}")
     
@@ -297,7 +299,7 @@ def main():
     if args.out_md:
         md_table = generate_markdown_table(df, args.metrics, pvalue_map, args.baseline_method)
         Path(args.out_md).parent.mkdir(parents=True, exist_ok=True)
-        with open(args.out_md, 'w') as f:
+        with open(args.out_md, 'w', encoding='utf-8') as f:
             f.write(md_table)
         print(f"✓ Markdown table saved: {args.out_md}")
     
