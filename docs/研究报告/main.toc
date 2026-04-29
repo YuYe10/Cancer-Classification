@@ -44,15 +44,16 @@
 \contentsline {subsection}{\numberline {7.2}性能差异解释}{16}{subsection.7.2}%
 \contentsline {subsection}{\numberline {7.3}可视化证据}{17}{subsection.7.3}%
 \contentsline {subsection}{\numberline {7.4}类别级误差分析}{19}{subsection.7.4}%
-\contentsline {subsection}{\numberline {7.5}小结}{19}{subsection.7.5}%
-\contentsline {section}{\numberline {8}讨论}{20}{section.8}%
-\contentsline {subsection}{\numberline {8.1}为什么做这项研究}{20}{subsection.8.1}%
-\contentsline {subsection}{\numberline {8.2}方法差异的解释}{20}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3}为什么严格 CV 是主结论口径}{20}{subsection.8.3}%
-\contentsline {subsection}{\numberline {8.4}MOFA 的价值与边界}{20}{subsection.8.4}%
-\contentsline {subsection}{\numberline {8.5}当前局限}{21}{subsection.8.5}%
-\contentsline {subsection}{\numberline {8.6}后续工作}{21}{subsection.8.6}%
-\contentsline {subsection}{\numberline {8.7}本研究的 novelty 边界声明}{21}{subsection.8.7}%
-\contentsline {subsection}{\numberline {8.8}详细继续改进方案}{22}{subsection.8.8}%
-\contentsline {section}{\numberline {9}结论}{22}{section.9}%
-\contentsline {section}{\numberline {10}参考文献}{23}{section.10}%
+\contentsline {subsection}{\numberline {7.5}小结}{20}{subsection.7.5}%
+\contentsline {subsection}{\numberline {7.6}可解释性分析（SHAP）}{20}{subsection.7.6}%
+\contentsline {section}{\numberline {8}讨论}{21}{section.8}%
+\contentsline {subsection}{\numberline {8.1}为什么做这项研究}{21}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}方法差异的解释}{21}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}为什么严格 CV 是主结论口径}{21}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}MOFA 的价值与边界}{21}{subsection.8.4}%
+\contentsline {subsection}{\numberline {8.5}当前局限}{22}{subsection.8.5}%
+\contentsline {subsection}{\numberline {8.6}后续工作}{22}{subsection.8.6}%
+\contentsline {subsection}{\numberline {8.7}本研究的 novelty 边界声明}{22}{subsection.8.7}%
+\contentsline {subsection}{\numberline {8.8}详细继续改进方案}{23}{subsection.8.8}%
+\contentsline {section}{\numberline {9}结论}{23}{section.9}%
+\contentsline {section}{\numberline {10}参考文献}{24}{section.10}%

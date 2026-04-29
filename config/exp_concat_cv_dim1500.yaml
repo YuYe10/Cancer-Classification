@@ -1,0 +1,18 @@
+exp: concat_dim_1500
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+preprocess:
+  rna_top_var: 1500
+  meth_top_var: 1500
+model:
+  type: svm
+  test_size: 0.2
+  random_state: 42
+evaluation:
+  mode: repeated_cv
+  folds: 5
+  repeats: 3
+mofa:
+  factors: 20

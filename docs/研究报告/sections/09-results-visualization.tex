@@ -68,25 +68,23 @@ Stacking & 0.8488 [0.7953, 0.9023] & 0.8481 & 0.8398 \\
 
 \subsection{类别级误差分析}
 
-为回答“提升来自哪里”，我们进一步统计各方法在三类有效标签（LumA/LumB/Basal）上的 fold-level 平均召回率。该表由 \texttt{outputs/logs/class\_error\_analysis.csv} 自动生成，避免手工录入误差。结果显示四种方法的最难类别均为 LumB，其中 Concat 的 LumB 召回率最高（0.8460），相较 RNA-only（0.8020）提升明显；MOFA 在该类别上的召回最低（0.7120），与其整体方差较大现象一致。
+为回答"提升来自哪里"，我们进一步统计各方法在三类有效标签（LumA/LumB/Basal）上的 fold-level 平均召回率与 F1 分数。该表由 \texttt{outputs/logs/class\_error\_analysis.csv} 自动生成，避免手工录入误差。结果显示四种方法的最难类别均为 LumB，其中 Concat 的 LumB 召回率最高（0.8460），相较 RNA-only（0.8020）提升明显；MOFA 在该类别上的召回最低（0.7120），与其整体方差较大现象一致。从 F1 分数看，LumA 与 Basal 类的表现相对稳定，而 LumB 的类内差异最大，提示该类别仍有显著的分类难度。
 
-\begin{table}[H]
-\centering
-\caption{类别级召回率对比（fold-level 平均）}
-\label{tab:class-recall-mainline}
-\begin{tabular}{lccc}
-\toprule
-方法 & LumA Recall & LumB Recall & Basal Recall \\
-\midrule
-RNA-only & 0.9000 & 0.8020 & 0.9113 \\
-Concat & 0.9667 & 0.8460 & 0.9113 \\
-MOFA & 0.8000 & 0.7120 & 0.8553 \\
-Stacking & 0.8333 & 0.8020 & 0.9113 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{../../outputs/logs/class_recall_table.tex}
 
 \subsection{小结}
+
+\subsection{可解释性分析（SHAP）}
+
+为了补充模型可解释性，我们在 Concat 最佳模型上运行了 SHAP 分析，生成了总体特征重要性图与按类别的依赖图。下图展示了 SHAP summary（按绝对值平均排序的全局重要性）。更多按类别的局部依赖图保存在 `outputs/figures/`，用于深入解释各类决策边界。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\linewidth]{../../outputs/figures/shap_summary.png}
+\caption{SHAP summary：全局特征重要性（Concat 模型）。}
+\label{fig:shap_summary}
+\end{figure}
+
 
 正文结果部分聚焦一个核心问题：在统一口径下，四种方法是否呈现可复现的性能趋势。我们将“最优均值（Concat）+ 统计不显著 + 置信区间重叠”一并报告，避免把单一高分误写为确定性优势。
 
