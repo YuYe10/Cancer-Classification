@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import pandas as pd
-import sys
 
 df = pd.read_csv('outputs/logs/class_error_analysis.csv')
 
@@ -10,7 +9,7 @@ latex_lines = [
     r'\caption{Class-level recall and F1 scores (fold-level mean)}',
     r'\label{tab:class-recall-detailed}',
     r'\small',
-    r'\begin{tabular}{lrrrrrrrr}',
+    r'\begin{tabular}{lrrrrrr}',
     r'\toprule',
     r'Method & LumA Recall & LumB Recall & Basal Recall & LumA F1 & LumB F1 & Basal F1 \\',
     r'\midrule',
@@ -36,5 +35,5 @@ output = '\n'.join(latex_lines)
 print(output)
 
 # Also save to file
-with open('outputs/logs/class_recall_table.tex', 'w') as f:
+with open('outputs/logs/class_recall_table.tex', 'w', encoding='utf-8') as f:
     f.write(output)

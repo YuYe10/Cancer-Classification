@@ -2,7 +2,7 @@
 
 \subsection{主实验结果汇总（严格 CV）}
 
-本文主结果统一采用 repeated stratified CV（5 folds $\times$ 3 repeats）口径。四种方法在同一评估协议下比较 Accuracy、Balanced Accuracy 与 Macro-F1，并报告均值与 95\% CI。以下结果来自最新的 \texttt{outputs/logs/summary\_v2.csv}，对应的自动汇总表为 \texttt{outputs/logs/method\_comparison\_table.md/.tex}。
+本文主结果统一采用 repeated stratified CV（5 folds $\times$ 3 repeats）口径。四种方法在同一评估协议下比较 Accuracy、Balanced Accuracy 与 Macro-F1，并报告均值与 95\% CI。所有主线图表均由 \texttt{scripts/generate\_paper\_artifacts.py} 从真实日志自动生成，避免将调试图、示意图或旧版 mock 图混入正文。以下结果来自最新的 \texttt{outputs/logs/summary\_v2.csv}，对应的自动汇总表为 \texttt{outputs/logs/method\_comparison\_table.md/.tex}。
 
 \begin{table}[H]
 \centering
@@ -68,7 +68,7 @@ Stacking & 0.8488 [0.7953, 0.9023] & 0.8481 & 0.8398 \\
 
 \subsection{类别级误差分析}
 
-为回答"提升来自哪里"，我们进一步统计各方法在三类有效标签（LumA/LumB/Basal）上的 fold-level 平均召回率与 F1 分数。该表由 \texttt{outputs/logs/class\_error\_analysis.csv} 自动生成，避免手工录入误差。结果显示四种方法的最难类别均为 LumB，其中 Concat 的 LumB 召回率最高（0.8460），相较 RNA-only（0.8020）提升明显；MOFA 在该类别上的召回最低（0.7120），与其整体方差较大现象一致。从 F1 分数看，LumA 与 Basal 类的表现相对稳定，而 LumB 的类内差异最大，提示该类别仍有显著的分类难度。
+为回答“提升来自哪里”，我们进一步统计各方法在三类有效标签（LumA/LumB/Basal）上的 fold-level 平均召回率与 F1 分数。该表由 \texttt{outputs/logs/class\_error\_analysis.csv} 自动生成，避免手工录入误差。结果显示四种方法的最难类别均为 LumB，其中 Concat 的 LumB 召回率最高（0.8460），相较 RNA-only（0.8020）提升明显；MOFA 在该类别上的召回最低（0.7120），与其整体方差较大现象一致。从 F1 分数看，LumA 与 Basal 类的表现相对稳定，而 LumB 的类内差异最大，提示该类别仍有显著的分类难度。
 
 \input{../../outputs/logs/class_recall_table.tex}
 
@@ -76,7 +76,7 @@ Stacking & 0.8488 [0.7953, 0.9023] & 0.8481 & 0.8398 \\
 
 \subsection{可解释性分析（SHAP）}
 
-为了补充模型可解释性，我们在 Concat 最佳模型上运行了 SHAP 分析，生成了总体特征重要性图与按类别的依赖图。下图展示了 SHAP summary（按绝对值平均排序的全局重要性）。更多按类别的局部依赖图保存在 `outputs/figures/`，用于深入解释各类决策边界。
+为了补充模型可解释性，我们在 Concat 最佳模型上运行了 SHAP 分析，生成了总体特征重要性图。下图展示了 SHAP summary（按绝对值平均排序的全局重要性）。按类别的局部依赖图属于内部诊断产物，已归档，不纳入正文主线，以避免出现带有内部调试语义的图件。
 
 \begin{figure}[H]
 \centering

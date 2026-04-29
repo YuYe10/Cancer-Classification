@@ -142,7 +142,7 @@ Cancer-Classification/
 │       ├── feature_distribution.py
 │       ├── model_performance.py
 │       ├── fusion_methods.py
-│       └── generate_report_figures.py
+│       └── generate_report_figures.py   # 兼容包装器，现已转向白名单图表流水线
 ├── experiments/
 │   └── run.py                # 实验运行脚本
 ├── outputs/
@@ -212,11 +212,11 @@ bash run_all.sh
 \subsection*{生成可视化图表}
 
 \begin{verbatim}
-# 生成所有论文所需的图表
-./medical/bin/python3 src/visualization/generate_report_figures.py
+# 生成论文白名单图表并归档非正文图
+./medical/bin/python3 scripts/generate_paper_artifacts.py --archive-legacy
 
 # 输出目录：outputs/figures/
-# 包含：特征分布、模型性能、混淆矩阵、消融结果等
+# 包含：统计主结果图、稳定性图、SHAP summary
 \end{verbatim}
 
 \subsection*{预期输出}
