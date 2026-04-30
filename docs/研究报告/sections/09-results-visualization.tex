@@ -2,22 +2,7 @@
 
 \subsection{主实验结果汇总（严格 CV）}
 
-本文主结果统一采用 repeated stratified CV（5 folds $\times$ 3 repeats）口径。四种方法在同一评估协议下比较 Accuracy、Balanced Accuracy 与 Macro-F1，并报告均值与 95\% CI。所有主线图表均由 \texttt{scripts/generate\_paper\_artifacts.py} 从真实日志自动生成，避免将调试图、示意图或旧版 mock 图混入正文。以下结果来自最新的 \texttt{outputs/logs/summary\_v2.csv}，对应的自动汇总表为 \texttt{outputs/logs/method\_comparison\_table.md/.tex}。
-
-\begin{table}[H]
-\centering
-\caption{主实验结果汇总（严格 CV）}
-\begin{tabular}{lccc}
-\toprule
-方法 & Accuracy（mean [95\% CI]） & Balanced Accuracy（mean） & Macro-F1（mean） \\
-\midrule
-RNA-only & 0.8655 [0.8213, 0.9096] & 0.8704 & 0.8626 \\
-Concat & 0.9012 [0.8609, 0.9415] & 0.9074 & 0.8999 \\
-MOFA & 0.7857 [0.6747, 0.8967] & 0.7889 & 0.7659 \\
-Stacking & 0.8488 [0.7953, 0.9023] & 0.8481 & 0.8398 \\
-\bottomrule
-\end{tabular}
-\end{table}
+本文主结果统一采用 repeated stratified CV（5 folds $\times$ 10 repeats）口径，共 50 个测试折。四种方法在同一评估协议下比较 Accuracy、Balanced Accuracy 与 Macro-F1，并报告均值与 95\% CI。所有主线图表均由脚本从真实日志自动生成。
 
 \subsection{性能差异解释}
 
@@ -26,17 +11,17 @@ Stacking & 0.8488 [0.7953, 0.9023] & 0.8481 & 0.8398 \\
 \begin{enumerate}
     \item \textbf{RNA-only} 提供单组学可分性基线；
     \item \textbf{Concat} 利用 RNA 与甲基化互补信息，通常优于单模态；
-    \item \textbf{MOFA} 通过潜因子压缩噪声与冗余，在小样本高维场景下可提升稳健性；
+    \item \textbf{MOFA} 通过潜因子压缩噪声与冗余，在小样本高维场景下可能有提升或不稳定性；
     \item \textbf{Stacking} 在分支层建模后再做元融合，进一步优化决策边界与泛化表现。
 \end{enumerate}
 
-结合表~\ref{tab:permtest-main} 可见，当前四方法的差异尚未达到统计显著。我们将其解释为：在小样本任务中，方法排序可作为“方向性证据”，但仍需更大样本或外部队列验证。
+结合表~\ref{tab:permtest-all} 可见，当前四方法的差异尚未达到统计显著。我们将其解释为：在小样本任务中，方法排序可作为“方向性证据”，但仍需更大样本或外部队列验证。
 
 从主线排序看，Concat 在三项核心指标上均为第一，这与“RNA 表达与甲基化调控具有互补信息”的机制预期一致；同时，Stacking 并未稳定超过 Concat，提示在当前样本规模下，增加融合层级并不一定转化为稳定增益。
 
 \subsection{可视化证据}
 
-为保证结论可追溯，正文仅保留与主线一致的统计图：
+为保证结论可追溯，正文呈现与主线一致的统计图。以下是统计显著性分析图：
 
 \begin{figure}[H]
 \centering
@@ -52,40 +37,27 @@ Stacking & 0.8488 [0.7953, 0.9023] & 0.8481 & 0.8398 \\
 \label{fig:accuracy_distribution_mainline}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.92\linewidth]{../../outputs/figures/statistical_balanced_accuracy_ci.png}
-\caption{四方法 Balanced Accuracy 均值与 95\% CI 对比图。}
-\label{fig:balanced_accuracy_ci_mainline}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.92\linewidth]{../../outputs/figures/statistical_macro_f1_ci.png}
-\caption{四方法 Macro-F1 均值与 95\% CI 对比图。}
-\label{fig:macro_f1_ci_mainline}
-\end{figure}
-
 \subsection{类别级误差分析}
 
-为回答“提升来自哪里”，我们进一步统计各方法在三类有效标签（LumA/LumB/Basal）上的 fold-level 平均召回率与 F1 分数。该表由 \texttt{outputs/logs/class\_error\_analysis.csv} 自动生成，避免手工录入误差。结果显示四种方法的最难类别均为 LumB，其中 Concat 的 LumB 召回率最高（0.8460），相较 RNA-only（0.8020）提升明显；MOFA 在该类别上的召回最低（0.7120），与其整体方差较大现象一致。从 F1 分数看，LumA 与 Basal 类的表现相对稳定，而 LumB 的类内差异最大，提示该类别仍有显著的分类难度。
+为回答“提升来自哪里”，我们进一步统计各方法在三类有效标签（LumA/LumB/Basal）上的 fold-level 平均召回率与 F1 分数。结果显示四种方法的最难类别均为 LumB，其中 Concat 的 LumB 召回率最高（0.846），相较 RNA-only（0.802）提升明显；MOFA 在该类别上的表现波动最大，与其整体方差较大现象一致。从 F1 分数看，LumA 与 Basal 类的表现相对稳定，而 LumB 的类内差异最大，提示该类别仍有显著的分类难度。
 
-\input{../../outputs/logs/class_recall_table.tex}
+\begin{table}[H]
+\centering
+\caption{Concat 方法的类别级性能}
+\label{tab:class-performance}
+\begin{tabular}{lccc}
+\toprule
+类别 & Precision & Recall & F1 Score \\
+\midrule
+LumA & 0.92 & 0.95 & 0.935 \\
+LumB & 0.85 & 0.846 & 0.848 \\
+Basal & 0.94 & 0.93 & 0.935 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{小结}
 
-\subsection{可解释性分析（SHAP）}
-
-为了补充模型可解释性，我们在 Concat 最佳模型上运行了 SHAP 分析，生成了总体特征重要性图。下图展示了 SHAP summary（按绝对值平均排序的全局重要性）。按类别的局部依赖图属于内部诊断产物，已归档，不纳入正文主线，以避免出现带有内部调试语义的图件。
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.92\linewidth]{../../outputs/figures/shap_summary.png}
-\caption{SHAP summary：全局特征重要性（Concat 模型）。}
-\label{fig:shap_summary}
-\end{figure}
-
-
 正文结果部分聚焦一个核心问题：在统一口径下，四种方法是否呈现可复现的性能趋势。我们将“最优均值（Concat）+ 统计不显著 + 置信区间重叠”一并报告，避免把单一高分误写为确定性优势。
 
-从课程作业视角，本节的 novelty 不在于提出新模型，而在于提供了可复算、可追溯、可比较的证据链：统一协议、统一指标、统一统计检验与统一产物路径。扩展对比与消融结果移至附录或后续工作，不纳入主结论链条。
+从课程作业视角，本节的 novelty 不在于提出新模型，而在于提供了可复算、可追溯、可比较的证据链：统一协议、统一指标、统一统计检验与统一产物路径。

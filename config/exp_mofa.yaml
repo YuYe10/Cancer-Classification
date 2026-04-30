@@ -6,8 +6,8 @@ data:
   clinical_path: datasets/brca_pam50.csv
 
 preprocess:
-  rna_top_var: 500
-  meth_top_var: 500
+  rna_top_var: 1000
+  meth_top_var: 1000
 
 model:
   type: svm
@@ -17,7 +17,7 @@ model:
 evaluation:
   mode: repeated_cv
   folds: 5
-  repeats: 3
+  repeats: 10
 
 mofa:
   factors: 20

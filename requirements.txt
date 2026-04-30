@@ -8,3 +8,6 @@ umap-learn
 shap
 mofapy2
 pyyaml
+scipy
+statsmodels
+gseapy
