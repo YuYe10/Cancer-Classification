@@ -2,9 +2,9 @@
 
 \subsection{主实验结果汇总（严格 CV）}
 
-本文主结果统一采用 repeated stratified CV（5 folds $\times$ 10 repeats）口径，共 50 个测试折。六种方法在同一评估协议下比较 Accuracy、Balanced Accuracy 与 Macro-F1，并报告均值与 95\% CI。所有主线图表均由脚本从真实日志自动生成。
+本文主结果统一采用 repeated stratified CV（5 folds $\times$ 10 repeats）口径，共 50 个测试折。六种方法在同一评估协议下比较 Accuracy、Balanced Accuracy 与 Macro-F1，并报告均值与 95\% CI。所有主线图表均由实验系统自动从日志数据生成。
 
-基于 \texttt{outputs/logs/summary1/summary.csv} 中的 41 组实验结果，核心发现如下：
+基于实验日志汇总文件中的 41 组实验结果，核心发现如下：
 
 \begin{enumerate}
     \item \textbf{Concat-SVM 取得最优综合性能}：Accuracy=90.64\%，Macro-F1=90.03\%，Balanced Acc=90.56\%
@@ -35,7 +35,7 @@
 
 % [图表占位符 1] 六种方法 Accuracy 均值与 95% CI 对比柱状图
 % 图表类型: 分组柱状图 + 误差线
-% 数据来源: summary.csv 中 accuracy_mean, accuracy_ci95_low, accuracy_ci95_high 字段
+% 数据来源: 实验日志汇总文件中 accuracy_mean, accuracy_ci95_low, accuracy_ci95_high 字段
 % 预期展示内容: 六种方法的 Accuracy 均值对比，误差线表示 95% 置信区间
 % 建议配色: 每种方法使用不同颜色，按性能排序排列
 \begin{figure}[H]
@@ -44,7 +44,7 @@
 \texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
 \textbf{图1: 六种融合策略 Accuracy 均值与 95\% CI 对比}\\[0.5em]
 类型: 分组柱状图 + 误差线\\
-数据源: summary.csv (accuracy\_mean, accuracy\_ci95\_low/high)\\
+数据源: 实验日志汇总文件 (accuracy\_mean, accuracy\_ci95\_low/high)\\
 x轴: 方法名称 | y轴: Accuracy (0.80--0.95)
 \vspace{4cm}}}
 \caption{六种融合策略 Accuracy 均值与 95\% CI 对比图。}
@@ -61,7 +61,7 @@ x轴: 方法名称 | y轴: Accuracy (0.80--0.95)
 \texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
 \textbf{图2: 六种方法 fold-level Accuracy 分布箱线图}\\[0.5em]
 类型: 箱线图 + 散点抖动\\
-数据源: 各实验 JSON (fold-level accuracy)\\
+数据源: 各实验日志文件 (fold-level accuracy)\\
 x轴: 方法名称 | y轴: Accuracy (0.65--1.00)
 \vspace{4cm}}}
 \caption{六种方法 fold-level Accuracy 分布（箱线图）。}
@@ -70,7 +70,7 @@ x轴: 方法名称 | y轴: Accuracy (0.65--1.00)
 
 % [图表占位符 3] 特征维度敏感性分析图
 % 图表类型: 折线图
-% 数据来源: config/concat/dim/ 目录下 dim100-dim1500 实验结果
+% 数据来源: Concat维度敏感性实验配置结果
 % 预期展示内容: 不同特征维度(100/300/500/1000/1500)下的 Macro-F1 变化趋势
 \begin{figure}[H]
 \centering
@@ -78,7 +78,7 @@ x轴: 方法名称 | y轴: Accuracy (0.65--1.00)
 \texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
 \textbf{图3: Concat 特征维度敏感性分析}\\[0.5em]
 类型: 折线图 + 散点标记\\
-数据源: config/concat/dim/*.yaml 实验结果\\
+数据源: Concat维度敏感性实验结果\\
 x轴: 特征维度 (100--1500) | y轴: Macro-F1 (0.75--0.92)\\
 关键发现: dim500 后趋于饱和，dim100 明显欠拟合
 \vspace{4cm}}}
@@ -88,7 +88,7 @@ x轴: 特征维度 (100--1500) | y轴: Macro-F1 (0.75--0.92)\\
 
 % [图表占位符 4] MOFA 因子数敏感性分析图
 % 图表类型: 折线图
-% 数据来源: mofa/factors/ 目录下 factors10-25 实验结果
+% 数据来源: MOFA因子数敏感性实验配置结果
 % 预期展示内容: 不同潜在因子数(10/15/20/25)下的性能变化
 \begin{figure}[H]
 \centering
@@ -96,7 +96,7 @@ x轴: 特征维度 (100--1500) | y轴: Macro-F1 (0.75--0.92)\\
 \texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
 \textbf{图4: MOFA 潜在因子数敏感性分析}\\[0.5em]
 类型: 折线图 + 散点标记\\
-数据源: config/mofa/factors/*.yaml 实验结果\\
+数据源: MOFA因子数敏感性实验结果\\
 x轴: 因子数 (10--25) | y轴: Macro-F1 (0.84--0.90)\\
 关键发现: factors=15 最优，factors=25 出现过拟合迹象
 \vspace{4cm}}}
@@ -106,7 +106,7 @@ x轴: 因子数 (10--25) | y轴: Macro-F1 (0.84--0.90)\\
 
 % [图表占位符 5] Stacking 变体对比热力图
 % 图表类型: 热力图 (Heatmap)
-% 数据来源: stacking/cv/ 和 stacking/hyperparams/ 目录下实验结果
+% 数据来源: Stacking变体实验配置结果
 % 预期展示内容: Stacking 不同 base/meta 模型组合及超参数配置的性能矩阵
 \begin{figure}[H]
 \centering
@@ -114,7 +114,7 @@ x轴: 因子数 (10--25) | y轴: Macro-F1 (0.84--0.90)\\
 \texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
 \textbf{图5: Stacking 变体性能对比热力图}\\[0.5em]
 类型: 热力图 (行=base模型, 列=meta模型)\\
-数据源: config/stacking/cv/*.yaml 实验结果\\
+数据源: Stacking变体实验结果\\
 色阶: Macro-F1 (0.73--0.85)，红高蓝低\\
 关键发现: XGB+XGB sota 反而低于 RF+XGB hybrid
 \vspace{4cm}}}
@@ -124,7 +124,7 @@ x轴: 因子数 (10--25) | y轴: Macro-F1 (0.84--0.90)\\
 
 % [图表占位符 6] 消融实验对比柱状图
 % 图表类型: 分组柱状图
-% 数据来源: ablation/ 目录下消融实验结果
+% 数据来源: 消融实验配置结果
 % 预期展示内容: 完整模型 vs 去除各组件后的性能变化
 \begin{figure}[H]
 \centering
@@ -132,7 +132,7 @@ x轴: 因子数 (10--25) | y轴: Macro-F1 (0.84--0.90)\\
 \texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
 \textbf{图6: 消融实验性能对比}\\[0.5em]
 类型: 分组柱状图 + 误差线\\
-数据源: config/ablation/*.yaml 实验结果\\
+数据源: 消融实验结果\\
 x轴: 消融条件 (Full/no\_FS/no\_Meth/no\_RNA/balanced) | y轴: Macro-F1 (0.78--0.90)\\
 关键发现: 去除 Meth 影响最大(-8.8\%)，去除 FS 影响最小(-2.7\%)
 \vspace{4cm}}}
@@ -234,24 +234,25 @@ MOFA 在 factors=15--20 区间表现最佳，factors=25 时出现性能下降（
 
 \begin{table}[H]
 \centering
+\small
 \caption{Stacking 变体性能全面对比 ($n$=25)}
 \label{tab:stacking-all}
 \begin{tabular}{llccc}
 \toprule
-Base Model & Meta Model & Accuracy & Balanced Acc & Macro F1 \\
+Base & Meta & Acc & Bal-Acc & Macro-F1 \\
 \midrule
 XGB & Logistic & 0.8556 & 0.8479 & 0.8479 \\
-XGB & XGB (SOTA) & 0.8089 & 0.7905 & 0.7866 \\
-RF & XGB (Hybrid) & 0.8600 & 0.8511 & 0.8507 \\
-SVM(balanced) & XGB & 0.8533 & 0.8497 & 0.8061 \\
+XGB & XGB-SOTA & 0.8089 & 0.7905 & 0.7866 \\
+RF & XGB-Hyb & 0.8600 & 0.8511 & 0.8507 \\
+SVM-bal & XGB & 0.8533 & 0.8497 & 0.8061 \\
 SVM & XGB & 0.8533 & 0.8497 & 0.8061 \\
 XGB & SVM & 0.8622 & 0.8527 & 0.8147 \\
-XGB & LR(meta) & 0.7911 & 0.7718 & 0.7745 \\
+XGB & LR-meta & 0.7911 & 0.7718 & 0.7745 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-令人意外的是，被设计为"SOTA"的 XGB+XGB Stacking（exp\_stacking\_sota\_cv.yaml）表现最差（Macro-F1=78.66\%），而 RF+XGB Hybrid 变体取得了 Stacking 组内的最佳成绩（Macro-F1=85.07\%）。这表明 Stacking 的性能对 base/meta 模型选择极为敏感，不存在普适最优配置。
+令人意外的是，被设计为"SOTA"的 XGB+XGB Stacking 表现最差（Macro-F1=78.66\%），而 RF+XGB Hybrid 变体取得了 Stacking 组内的最佳成绩（Macro-F1=85.07\%）。这表明 Stacking 的性能对 base/meta 模型选择极为敏感，不存在普适最优配置。
 
 \subsection{小结}
 

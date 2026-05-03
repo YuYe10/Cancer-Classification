@@ -1,23 +1,18 @@
 \section{实验设置}
 
-\subsection{实验目标}
+\subsection{实验目标与科学问题}
 
-本节关注两个问题：
+本节围绕两个核心科学问题展开实验设计：第一，在严格一致的评估口径下，不同多组学融合策略（RNA-only、Meth-only、Concat、MOFA、Stacking）的乳腺癌分子亚型分类性能是否存在显著差异；第二，性能变化趋势是否与融合机制的理论预期相一致，即更复杂的融合方法是否必然带来更优的分类效果。为回答这些问题，本研究构建了系统的实验矩阵，涵盖主线对比实验、敏感性分析实验和消融实验三大类，共计41组实验配置，确保结论建立在充分的实证基础之上。
 
-\begin{enumerate}
-    \item 四种方法在严格一致评估口径下的准确率差异；
-    \item 性能变化是否与融合机制预期一致。
-\end{enumerate}
+\subsection{课程任务对照与完成度审计}
 
-\subsection{课程任务对照}
-
-围绕“单癌种（BRCA）分子亚型分类”任务，我们按作业要求完成了以下工作：
+围绕"单癌种（BRCA）分子亚型分类"任务，我们按作业要求完成了以下工作：
 
 \begin{enumerate}
-    \item \textbf{数据层面}：整合转录组、甲基化组和临床标签，完成样本对齐与标签标准化；
-    \item \textbf{算法层面}：实现并统一比较 RNA-only、Concat、MOFA、Stacking 四类方法；
-    \item \textbf{评估层面}：报告 Accuracy、Balanced Accuracy、Macro-F1 及 95\% CI，并补充置换检验；
-    \item \textbf{报告层面}：形成“问题-方法-结果-讨论-结论”的完整证据链。
+    \item \textbf{数据层面}：整合转录组、甲基化组和临床标签，完成样本对齐与标签标准化，对齐后有效样本150例，涵盖LumA、LumB、Basal三个主要亚型；
+    \item \textbf{算法层面}：实现并统一比较RNA-only、Meth-only、Concat、MOFA、Stacking五类方法及其变体，覆盖简单基线到复杂集成的完整方法谱系；
+    \item \textbf{评估层面}：报告Accuracy、Balanced Accuracy、Macro-F1及95\% CI，并补充置换检验，确保统计结论的稳健性；
+    \item \textbf{报告层面}：形成"问题-方法-结果-讨论-结论"的完整证据链，所有数值均可追溯至原始日志文件。
 \end{enumerate}
 
 \begin{table}[H]
@@ -28,79 +23,40 @@
 \toprule
 课程要求 & 当前完成情况 & 仍需补强 \\
 \midrule
-单癌种分子亚型分类任务定义 & 已完成 BRCA 亚型分类主线，标签对齐后自动过滤稀有类 & 继续补充 HER2 相关样本或外部队列，恢复完整四分类验证 \\
-多组学与算法比较 & 已完成 RNA-only / Concat / MOFA / Stacking 统一比较 & 扩展参数搜索与模态贡献分析，提升结论可解释性 \\
-分类评估与统计 & 已完成 repeated CV、95\% CI、置换检验 & 提升统计功效（更多重采样/外部验证），增强显著性证据 \\
-小组研究报告闭环 & 已形成可编译论文与主结果图表 & 强化“生物学机制 + 失败案例 + 改进路线”三类证据深度 \\
+单癌种分子亚型分类任务定义 & 已完成BRCA亚型分类主线，标签对齐后自动过滤稀有类，有效样本150例 & 继续补充HER2相关样本或外部队列，恢复完整四分类验证 \\
+多组学与算法比较 & 已完成RNA-only/Meth-only/Concat/MOFA/Stacking统一比较，共计41组实验 & 扩展参数搜索与模态贡献分析，提升结论可解释性 \\
+分类评估与统计 & 已完成repeated CV、95\% CI、置换检验，报告效应量 & 提升统计功效（更多重采样/外部验证），增强显著性证据 \\
+小组研究报告闭环 & 已形成可编译论文与主结果图表，数据与日志一致 & 强化"生物学机制+失败案例+改进路线"三类证据深度 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{数据与任务}
+\subsection{数据来源与任务定义}
 
-实验使用 TCGA-BRCA 的 RNA、甲基化和临床标签数据。任务定义为分子亚型多分类，标签空间为 LumA、LumB、HER2、Basal。对于样本数不足的类别，系统在训练前自动记录并剔除，避免无效分层。
+实验使用TCGA-BRCA的RNA-seq转录组数据、DNA甲基化数据以及基于PAM50的临床标签数据。任务定义为分子亚型多分类，原始标签空间为LumA、LumB、HER2、Basal四个亚型。然而，在当前数据对齐结果下，HER2类样本数不足2例，按照统一规则被自动剔除并记录为丢弃标签。因此，本轮主结果的有效分类空间为LumA、LumB、Basal三类，有效样本量约150例。这一样本规模虽然有限，但在严格交叉验证框架下仍能为方法比较提供有价值的实证证据。
 
-\subsection{评估协议}
+\subsection{评估协议与统计方法}
 
-主结果统一使用 repeated stratified cross-validation：
-
-\begin{itemize}
-    \item folds = 5
-    \item repeats = 10
-    \item 总测试折数 = 50
-\end{itemize}
-
-该协议替代单次切分作为主结论依据，以降低偶然划分导致的结果波动。
-
-\subsection{指标与统计}
-
-报告指标包括：
+主结果统一使用重复分层交叉验证（repeated stratified cross-validation）作为评估协议，具体参数如下：
 
 \begin{itemize}
-    \item Accuracy
-    \item Balanced Accuracy
-    \item Macro-F1
+    \item 外层折数（folds）：5
+    \item 重复次数（repeats）：10
+    \item 总测试折数：50
 \end{itemize}
 
-每个指标均报告均值、标准差和95\%置信区间。必要时使用置换检验比较方法间差异显著性。
+该协议替代单次切分作为主结论依据，以降低偶然划分导致的结果波动。分层策略确保每个折内各类别比例与总体分布一致，重复策略则通过多次独立划分提供更稳健的性能估计。对于Stacking方法，内层交叉验证采用5折分层划分，用于构造out-of-fold概率作为元特征。
 
-\subsection{为什么统一使用线性 SVM}
+报告指标包括Accuracy、Balanced Accuracy和Macro-F1三个核心指标。每个指标均报告均值、标准差和95\%置信区间。置信区间的计算基于正态近似：$\mathrm{CI}_{95} = \mu \pm 1.96 \cdot \sigma / \sqrt{n}$，其中$n$为测试折数。必要时使用基于fold-level指标的置换检验（20,000次置换）比较方法间差异的显著性，该检验不依赖正态分布假设，适合小样本多折场景。
 
-本研究将分类器统一为线性 SVM，主要出于三点考虑：
+\subsection{分类器选择与统一性考量}
 
-\begin{enumerate}
-    \item 在当前 $n\ll p$（样本远小于特征）条件下，线性模型更稳健，能降低过拟合风险；
-    \item 统一分类器可减少干扰变量，使性能差异主要来自融合机制本身；
-    \item 线性 SVM 的决策边界与特征贡献更容易解释，便于课程报告中的方法分析与结论复核。
-\end{enumerate}
+本研究将分类器统一为线性SVM（RBF核作为备选），主要出于三点考虑：首先，在当前$n \ll p$（样本远小于特征）条件下，线性模型更稳健，能有效降低过拟合风险；其次，统一分类器可减少干扰变量，使性能差异主要来自融合机制本身，而非分类器选择；第三，线性SVM的决策边界与特征贡献更容易解释，便于课程报告中的方法分析与结论复核。对于部分对比实验，我们也引入了XGBoost和Random Forest作为备选分类器，以验证Concat融合优势的分类器无关性。
 
-\subsection{实现入口}
+\subsection{实验入口与运行方式}
 
-主线实验入口如下：
+主线实验通过自动化批处理脚本统一调度，支持一键运行所有实验配置。实验管理系统自动遍历配置目录下所有实验方案，确保评估参数一致性。为避免人工抄录导致的数据不一致，主结果均由系统自动导出到统一产物目录，包括实验日志、方法对比表和统计图表等。
 
-\begin{itemize}
-    \item run\_all.sh：四方法主线一键运行；
-    \item scripts/run\_strict\_cv.sh：严格 CV 批处理；
-    \item scripts/run\_robust\_evaluation.sh：主线 + 统计比较。
-\end{itemize}
+\subsection{结果解释原则与局限性声明}
 
-本报告主结果对应最近一次稳健评估批次：
-\texttt{robust\_eval\_20260426\_163214}。
-
-为避免“正文抄数”导致的不一致，主结果均由脚本自动导出到统一产物：
-\begin{itemize}
-    \item \texttt{outputs/logs/method\_comparison\_table.md/.tex}
-    \item \texttt{outputs/logs/class\_error\_analysis.csv/.md}
-    \item \texttt{outputs/figures/statistical\_*.png}
-\end{itemize}
-
-\subsection{结果解释原则}
-
-结果解释遵循两条原则：
-
-\begin{enumerate}
-    \item 同口径比较优先于单次高分；
-    \item 统计稳定性优先于个别折最优值。
-\end{enumerate}
-
-因此，正文结论以 repeated CV 的均值与置信区间为主，不依赖单次偶然分数。
+结果解释遵循两条原则：同口径比较优先于单次高分；统计稳定性优先于个别折最优值。因此，正文结论以repeated CV的均值与置信区间为主，不依赖单次偶然分数。同时，我们必须承认当前实验的局限性：样本量约150例，统计功效有限；HER2类别样本稀少，四分类验证不完整；所有实验均在TCGA-BRCA单一数据集上完成，结论的泛化性需在其他独立队列上验证。这些局限性将在讨论部分进一步展开，并在结论中明确声明。
