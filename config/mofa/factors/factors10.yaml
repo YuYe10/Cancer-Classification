@@ -1,0 +1,23 @@
+# MOFA Factor Sensitivity: 10 latent factors
+# Purpose: Test whether fewer factors capture sufficient cross-omics signal
+# Hypothesis: Too few factors may underfit; expect lower accuracy than factors=20
+# Comparison baseline: exp_mofa.yaml (factors=20)
+
+exp: mofa
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 1000
+  meth_top_var: 1000
+
+model:
+  type: svm
+  test_size: 0.2
+  random_state: 42
+
+mofa:
+  factors: 10

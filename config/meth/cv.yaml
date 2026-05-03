@@ -1,0 +1,25 @@
+# Methylation-Only Classification (formal experiment, not ablation)
+# Purpose: Establish standalone methylation-based classification performance as a reference point
+# Rationale: DNA methylation captures epigenetic regulation patterns complementary to gene expression
+# Biological hypothesis: Methylation profiles may distinguish Basal-like (CpG island methylator phenotype) from other subtypes
+# Comparison baselines: exp_rna_cv.yaml (RNA-only), exp_concat_cv.yaml (multi-omics)
+# Expected outcome: Lower accuracy than RNA-only due to sparser signal, but may excel on specific subtype pairs (e.g., HER2 vs LumA)
+
+exp: meth
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  type: svm
+  test_size: 0.2
+  random_state: 42
+
+mofa:
+  factors: 20

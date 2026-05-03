@@ -1,0 +1,38 @@
+# Stacking Variant: Different inner CV splits for meta-feature generation
+# Purpose: Sensitivity analysis of meta_cv_splits parameter (3 vs default 5)
+# Hypothesis: Fewer inner splits (3) means more training data per fold → better base models but noisier OOF estimates
+# Trade-off: meta_cv_splits=3 gives larger training sets per inner fold but less reliable out-of-fold probabilities
+# Comparison baseline: exp_stacking_sota_cv.yaml (meta_cv_splits=5)
+
+exp: stacking
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  type: xgboost
+  test_size: 0.2
+  random_state: 42
+  n_jobs: -1
+  xgb_n_estimators: 900
+  xgb_max_depth: 6
+  xgb_learning_rate: 0.02
+  xgb_subsample: 0.85
+  xgb_colsample_bytree: 0.80
+  xgb_reg_lambda: 1.5
+  xgb_min_child_weight: 1.0
+  xgb_tree_method: hist
+
+stacking:
+  base_model_type: xgboost
+  meta_model_type: xgboost
+  meta_cv_splits: 3
+
+mofa:
+  factors: 20

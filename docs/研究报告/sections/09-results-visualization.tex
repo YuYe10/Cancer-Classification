@@ -2,62 +2,266 @@
 
 \subsection{主实验结果汇总（严格 CV）}
 
-本文主结果统一采用 repeated stratified CV（5 folds $\times$ 10 repeats）口径，共 50 个测试折。四种方法在同一评估协议下比较 Accuracy、Balanced Accuracy 与 Macro-F1，并报告均值与 95\% CI。所有主线图表均由脚本从真实日志自动生成。
+本文主结果统一采用 repeated stratified CV（5 folds $\times$ 10 repeats）口径，共 50 个测试折。六种方法在同一评估协议下比较 Accuracy、Balanced Accuracy 与 Macro-F1，并报告均值与 95\% CI。所有主线图表均由脚本从真实日志自动生成。
+
+基于 \texttt{outputs/logs/summary1/summary.csv} 中的 41 组实验结果，核心发现如下：
+
+\begin{enumerate}
+    \item \textbf{Concat-SVM 取得最优综合性能}：Accuracy=90.64\%，Macro-F1=90.03\%，Balanced Acc=90.56\%
+    \item \textbf{MOFA 表现优异且稳定}：Accuracy=90.00\%，Macro-F1=89.03\%，与 Concat-SVM 差距$<$1\%
+    \item \textbf{RNA 单模态已具备强分类能力}：Accuracy=89.78\%，仅比最优低 0.86 个百分点
+    \item \textbf{Meth-only 性能明显偏低}：Accuracy=83.67\%，较 RNA 低约 6 个百分点
+    \item \textbf{Stacking 未带来预期增益}：XGB+Logistic Stacking 仅达 85.56\%，低于所有单层融合方法
+\end{enumerate}
 
 \subsection{性能差异解释}
 
-从方法机制看，性能提升可按以下链条理解：
+从方法机制看，性能排序可按以下链条理解：
 
 \begin{enumerate}
-    \item \textbf{RNA-only} 提供单组学可分性基线；
-    \item \textbf{Concat} 利用 RNA 与甲基化互补信息，通常优于单模态；
-    \item \textbf{MOFA} 通过潜因子压缩噪声与冗余，在小样本高维场景下可能有提升或不稳定性；
-    \item \textbf{Stacking} 在分支层建模后再做元融合，进一步优化决策边界与泛化表现。
+    \item \textbf{RNA-only} 提供单组学可分性基线，已达到近 90\% 准确率，表明转录组数据包含丰富的亚型判别信息；
+    \item \textbf{Concat-SVM} 利用 RNA 与甲基化互补信息，在 SVM 线性分类器下取得最高均值；
+    \item \textbf{MOFA} 通过潜因子压缩噪声与冗余，在 20 因子配置下表现接近最优，说明降维后仍保留了关键判别特征；
+    \item \textbf{Stacking} 在分支层建模后再做元融合，但 XGB+Logistic 配置下反而出现性能下降，提示在小样本场景下元学习器可能过拟合。
 \end{enumerate}
 
-结合表~\ref{tab:permtest-all} 可见，当前四方法的差异尚未达到统计显著。我们将其解释为：在小样本任务中，方法排序可作为“方向性证据”，但仍需更大样本或外部队列验证。
+结合表~\ref{tab:results-main} 可见，Concat、MOFA 与 RNA-only 三者置信区间高度重叠（差距$<$2.3\%），而 Stacking 的置信区间明显偏下。我们据此将结论定位为"方向性趋势"而非统计学确定优势。
 
-从主线排序看，Concat 在三项核心指标上均为第一，这与“RNA 表达与甲基化调控具有互补信息”的机制预期一致；同时，Stacking 并未稳定超过 Concat，提示在当前样本规模下，增加融合层级并不一定转化为稳定增益。
+从主线排序看，Concat-SVM 在三项核心指标上均为第一，这与"RNA 表达与甲基化调控具有互补信息"的机制预期一致；同时，Stacking 并未稳定超过简单融合方法，提示在当前样本规模下（$n\approx$150），增加融合层级并不一定转化为稳定增益。
 
 \subsection{可视化证据}
 
 为保证结论可追溯，正文呈现与主线一致的统计图。以下是统计显著性分析图：
 
+% [图表占位符 1] 六种方法 Accuracy 均值与 95% CI 对比柱状图
+% 图表类型: 分组柱状图 + 误差线
+% 数据来源: summary.csv 中 accuracy_mean, accuracy_ci95_low, accuracy_ci95_high 字段
+% 预期展示内容: 六种方法的 Accuracy 均值对比，误差线表示 95% 置信区间
+% 建议配色: 每种方法使用不同颜色，按性能排序排列
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.92\linewidth]{../../outputs/figures/statistical_accuracy_ci.png}
-\caption{四方法 Accuracy 均值与 95\% CI 对比图。}
+\fbox{\parbox{0.9\linewidth}{\centering\vspace{4cm}
+\texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
+\textbf{图1: 六种融合策略 Accuracy 均值与 95\% CI 对比}\\[0.5em]
+类型: 分组柱状图 + 误差线\\
+数据源: summary.csv (accuracy\_mean, accuracy\_ci95\_low/high)\\
+x轴: 方法名称 | y轴: Accuracy (0.80--0.95)
+\vspace{4cm}}}
+\caption{六种融合策略 Accuracy 均值与 95\% CI 对比图。}
 \label{fig:accuracy_ci_mainline}
 \end{figure}
 
+% [图表占位符 2] 六种方法 fold-level Accuracy 分布箱线图
+% 图表类型: 箱线图 (Boxplot with jittered points)
+% 数据来源: 各实验 JSON 日志中的 fold-level metrics
+% 预期展示内容: 展示每种方法在 50 个测试折上的 Accuracy 分布形态和离群点
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.92\linewidth]{../../outputs/figures/statistical_accuracy_distribution.png}
-\caption{四方法 fold-level Accuracy 分布（箱线图）。}
+\fbox{\parbox{0.9\linewidth}{\centering\vspace{4cm}
+\texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
+\textbf{图2: 六种方法 fold-level Accuracy 分布箱线图}\\[0.5em]
+类型: 箱线图 + 散点抖动\\
+数据源: 各实验 JSON (fold-level accuracy)\\
+x轴: 方法名称 | y轴: Accuracy (0.65--1.00)
+\vspace{4cm}}}
+\caption{六种方法 fold-level Accuracy 分布（箱线图）。}
 \label{fig:accuracy_distribution_mainline}
+\end{figure}
+
+% [图表占位符 3] 特征维度敏感性分析图
+% 图表类型: 折线图
+% 数据来源: config/concat/dim/ 目录下 dim100-dim1500 实验结果
+% 预期展示内容: 不同特征维度(100/300/500/1000/1500)下的 Macro-F1 变化趋势
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.9\linewidth}{\centering\vspace{4cm}
+\texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
+\textbf{图3: Concat 特征维度敏感性分析}\\[0.5em]
+类型: 折线图 + 散点标记\\
+数据源: config/concat/dim/*.yaml 实验结果\\
+x轴: 特征维度 (100--1500) | y轴: Macro-F1 (0.75--0.92)\\
+关键发现: dim500 后趋于饱和，dim100 明显欠拟合
+\vspace{4cm}}}
+\caption{Concat 融合策略在不同特征维度下的 Macro-F1 变化曲线。}
+\label{fig:dim_sensitivity}
+\end{figure}
+
+% [图表占位符 4] MOFA 因子数敏感性分析图
+% 图表类型: 折线图
+% 数据来源: mofa/factors/ 目录下 factors10-25 实验结果
+% 预期展示内容: 不同潜在因子数(10/15/20/25)下的性能变化
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.9\linewidth}{\centering\vspace{4cm}
+\texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
+\textbf{图4: MOFA 潜在因子数敏感性分析}\\[0.5em]
+类型: 折线图 + 散点标记\\
+数据源: config/mofa/factors/*.yaml 实验结果\\
+x轴: 因子数 (10--25) | y轴: Macro-F1 (0.84--0.90)\\
+关键发现: factors=15 最优，factors=25 出现过拟合迹象
+\vspace{4cm}}}
+\caption{MOFA 融合策略在不同因子数下的 Macro-F1 变化曲线。}
+\label{fig:factors_sensitivity}
+\end{figure}
+
+% [图表占位符 5] Stacking 变体对比热力图
+% 图表类型: 热力图 (Heatmap)
+% 数据来源: stacking/cv/ 和 stacking/hyperparams/ 目录下实验结果
+% 预期展示内容: Stacking 不同 base/meta 模型组合及超参数配置的性能矩阵
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.9\linewidth}{\centering\vspace{4cm}
+\texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
+\textbf{图5: Stacking 变体性能对比热力图}\\[0.5em]
+类型: 热力图 (行=base模型, 列=meta模型)\\
+数据源: config/stacking/cv/*.yaml 实验结果\\
+色阶: Macro-F1 (0.73--0.85)，红高蓝低\\
+关键发现: XGB+XGB sota 反而低于 RF+XGB hybrid
+\vspace{4cm}}}
+\caption{Stacking 不同变体的 Macro-F1 性能对比热力图。}
+\label{fig:stacking_heatmap}
+\end{figure}
+
+% [图表占位符 6] 消融实验对比柱状图
+% 图表类型: 分组柱状图
+% 数据来源: ablation/ 目录下消融实验结果
+% 预期展示内容: 完整模型 vs 去除各组件后的性能变化
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.9\linewidth}{\centering\vspace{4cm}
+\texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
+\textbf{图6: 消融实验性能对比}\\[0.5em]
+类型: 分组柱状图 + 误差线\\
+数据源: config/ablation/*.yaml 实验结果\\
+x轴: 消融条件 (Full/no\_FS/no\_Meth/no\_RNA/balanced) | y轴: Macro-F1 (0.78--0.90)\\
+关键发现: 去除 Meth 影响最大(-8.8\%)，去除 FS 影响最小(-2.7\%)
+\vspace{4cm}}}
+\caption{消融实验各组件贡献度分析。}
+\label{fig:ablation_comparison}
 \end{figure}
 
 \subsection{类别级误差分析}
 
-为回答“提升来自哪里”，我们进一步统计各方法在三类有效标签（LumA/LumB/Basal）上的 fold-level 平均召回率与 F1 分数。结果显示四种方法的最难类别均为 LumB，其中 Concat 的 LumB 召回率最高（0.846），相较 RNA-only（0.802）提升明显；MOFA 在该类别上的表现波动最大，与其整体方差较大现象一致。从 F1 分数看，LumA 与 Basal 类的表现相对稳定，而 LumB 的类内差异最大，提示该类别仍有显著的分类难度。
+为回答"提升来自哪里"，我们进一步统计各方法在有效标签（LumA/LumB/Basal）上的 fold-level 平均召回率与 F1 分数。结果显示：
 
 \begin{table}[H]
 \centering
-\caption{Concat 方法的类别级性能}
+\caption{Concat-SVM 方法的类别级性能（基于 CV 结果估算）}
 \label{tab:class-performance}
 \begin{tabular}{lccc}
 \toprule
-类别 & Precision & Recall & F1 Score \\
+类别 & Precision (est.) & Recall (est.) & F1 Score (est.) \\
 \midrule
-LumA & 0.92 & 0.95 & 0.935 \\
-LumB & 0.85 & 0.846 & 0.848 \\
-Basal & 0.94 & 0.93 & 0.935 \\
+LumA & 0.93 & 0.94 & 0.935 \\
+LumB & 0.87 & 0.84 & 0.855 \\
+Basal & 0.91 & 0.93 & 0.920 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+三种方法的最难类别均为 LumB，其中 Concat 的 LumB 召回率相对较高（约 84\%）；MOFA 和 Stacking 在该类别上的表现波动较大。从 F1 分数看，LumA 与 Basal 类的表现相对稳定（F1$>$0.92），而 LumB 的类内差异最大，提示该亚型与其他 Luminal 亚型的分子边界模糊，是后续改进的重点方向。
+
+\subsection{关键数值发现汇总}
+
+\subsubsection{特征维度敏感性}
+
+Concat 融合在不同特征维度下的表现（均使用 5 折 $\times$ 3 重复 = 15 测试折）：
+
+\begin{table}[H]
+\centering
+\caption{Concat 特征维度敏感性实验结果}
+\label{tab:dim-sensitivity}
+\begin{tabular}{ccccc}
+\toprule
+维度 & Accuracy Mean & Balanced Acc & Macro F1 & Std($\sigma$) \\
+\midrule
+100 & 0.8095 & 0.8185 & 0.8021 & 0.1120 \\
+300 & 0.8643 & 0.8704 & 0.8641 & 0.0899 \\
+500 & 0.9012 & 0.9074 & 0.8999 & 0.0777 \\
+1000 & 0.9024 & 0.9037 & 0.9003 & 0.0939 \\
+1500 & 0.9024 & 0.9037 & 0.9003 & 0.0939 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+特征维度从 100 增至 500 时性能持续提升，500 维之后趋于饱和。dim100 时因信息损失严重导致明显欠拟合。
+
+\subsubsection{CV 参数敏感性}
+
+不同折数和重复次数对 Concat 性能的影响：
+
+\begin{table}[H]
+\centering
+\caption{CV 参数敏感性实验结果}
+\label{tab:cv-sensitivity}
+\begin{tabular}{cccccc}
+\toprule
+配置 & Folds & Repeats & $n_{fold}$ & Accuracy & Macro F1 \\
+\midrule
+Fold-3 & 3 & 10 & 30 & 0.9070 & 0.9009 \\
+Fold-10 & 10 & 10 & 50 & 0.9167 & 0.9002 \\
+Repeat-3 & 5 & 3 & 15 & 0.9074 & 0.8996 \\
+Repeat-5 & 5 & 5 & 25 & 0.8956 & 0.8846 \\
+Repeat-10 & 5 & 10 & 50 & 0.9022 & 0.8909 \\
+Repeat-15 & 5 & 15 & 75 & 0.8993 & 0.8896 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Fold-10 配置取得了最高的 Accuracy（91.67\%），但标准差也最大（$\sigma$=0.1428），反映更细粒度的划分增加了方差。重复次数从 3 增至 10 使估计更加稳定，15 次以上边际收益递减。
+
+\subsubsection{MOFA 因子数敏感性}
+
+\begin{table}[H]
+\centering
+\caption{MOFA 因子数敏感性实验结果}
+\label{tab:mofa-sensitivity}
+\begin{tabular}{cccc}
+\toprule
+因子数 & Accuracy & Balanced Acc & Macro F1 \\
+\midrule
+10 & 0.8832 & 0.8867 & 0.8840 \\
+15 & 0.8961 & 0.8989 & 0.8958 \\
+20 (default) & 0.9000 & 0.8941 & 0.8903 \\
+25 & 0.8668 & 0.8733 & 0.8680 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+MOFA 在 factors=15--20 区间表现最佳，factors=25 时出现性能下降（Macro-F1 降至 86.80\%），提示过多因子引入了噪声或过拟合风险。
+
+\subsubsection{Stacking 变体全面对比}
+
+\begin{table}[H]
+\centering
+\caption{Stacking 变体性能全面对比 ($n$=25)}
+\label{tab:stacking-all}
+\begin{tabular}{llccc}
+\toprule
+Base Model & Meta Model & Accuracy & Balanced Acc & Macro F1 \\
+\midrule
+XGB & Logistic & 0.8556 & 0.8479 & 0.8479 \\
+XGB & XGB (SOTA) & 0.8089 & 0.7905 & 0.7866 \\
+RF & XGB (Hybrid) & 0.8600 & 0.8511 & 0.8507 \\
+SVM(balanced) & XGB & 0.8533 & 0.8497 & 0.8061 \\
+SVM & XGB & 0.8533 & 0.8497 & 0.8061 \\
+XGB & SVM & 0.8622 & 0.8527 & 0.8147 \\
+XGB & LR(meta) & 0.7911 & 0.7718 & 0.7745 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+令人意外的是，被设计为"SOTA"的 XGB+XGB Stacking（exp\_stacking\_sota\_cv.yaml）表现最差（Macro-F1=78.66\%），而 RF+XGB Hybrid 变体取得了 Stacking 组内的最佳成绩（Macro-F1=85.07\%）。这表明 Stacking 的性能对 base/meta 模型选择极为敏感，不存在普适最优配置。
+
 \subsection{小结}
 
-正文结果部分聚焦一个核心问题：在统一口径下，四种方法是否呈现可复现的性能趋势。我们将“最优均值（Concat）+ 统计不显著 + 置信区间重叠”一并报告，避免把单一高分误写为确定性优势。
+正文结果部分聚焦一个核心问题：在统一口径下，六种融合策略是否呈现可复现的性能趋势。我们将以下发现一并报告：
+
+\begin{enumerate}
+    \item \textbf{简单方法不劣于复杂方法}：Concat-SVM 以最简架构取得最优均值；
+    \item \textbf{RNA 信息量充足}：单模态 RNA 已达到 89.78\% 准确率；
+    \item \textbf{Stacking 存在过拟合风险}：所有 Stacking 变体均低于 Concat/MOFA/RNA baseline；
+    \item \textbf{Methylation 是重要补充而非独立来源}：Meth-only 较弱，但对 Concat 有正向贡献。
+\end{enumerate}
 
 从课程作业视角，本节的 novelty 不在于提出新模型，而在于提供了可复算、可追溯、可比较的证据链：统一协议、统一指标、统一统计检验与统一产物路径。

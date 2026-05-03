@@ -1,0 +1,19 @@
+#==============================================================================
+# Shared Evaluation Configuration
+#==============================================================================
+# This file defines the DEFAULT evaluation parameters that should be used
+# by ALL experiment configurations for consistent comparability.
+#
+# Any experiment config can override individual parameter(s) for
+# sensitivity analysis (e.g., varying folds/repeats to test robustness).
+#
+# Parameters:
+#   mode    - evaluation strategy: "cv", "repeated_cv", or "holdout"
+#   folds   - number of outer cross-validation folds
+#   repeats - number of repeated CV iterations (only effective in repeated_cv mode)
+#==============================================================================
+
+evaluation:
+  mode: repeated_cv
+  folds: 5
+  repeats: 10

@@ -1,0 +1,21 @@
+# Concat: 3-repeat CV Sensitivity (minimal repeats)
+# Purpose: Test whether fewer repeats produce adequate performance estimates
+# Comparison baseline: config/concat/cv.yaml (10 repeats, 5 folds)
+exp: concat
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+preprocess:
+  rna_top_var: 500
+  meth_top_var: 500
+model:
+  type: svm
+  test_size: 0.2
+  random_state: 42
+evaluation:
+  mode: repeated_cv
+  folds: 5
+  repeats: 3
+mofa:
+  factors: 20

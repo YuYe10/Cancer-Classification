@@ -1,0 +1,38 @@
+# Stacking Variant: XGBoost base with SVM (linear) meta-classifier
+# Purpose: Test whether a linear SVM meta-learner provides better generalization than tree-based meta
+# Hypothesis: Linear meta may be more robust when base predictions are well-calibrated, avoiding overfitting
+# Rationale: Meta-feature space is low-dimensional (n_classes × n_views = 4 × 2 = 8 dims), linear model suffices
+# Expected outcome: Comparable or slightly better than XGB meta due to regularization benefit on small feature space
+
+exp: stacking
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  type: xgboost
+  test_size: 0.2
+  random_state: 42
+  n_jobs: -1
+  xgb_n_estimators: 900
+  xgb_max_depth: 6
+  xgb_learning_rate: 0.02
+  xgb_subsample: 0.85
+  xgb_colsample_bytree: 0.80
+  xgb_reg_lambda: 1.5
+  xgb_min_child_weight: 1.0
+  xgb_tree_method: hist
+
+stacking:
+  base_model_type: xgboost
+  meta_model_type: svm
+  meta_cv_splits: 5
+
+mofa:
+  factors: 20

@@ -1,0 +1,38 @@
+# Stacking Variant: SVM as base model with XGBoost meta-classifier
+# Purpose: Test whether linear SVM base models produce more robust probability calibrations for stacking
+# Hypothesis: SVM base may reduce overfitting in inner CV compared to XGB base, but could underfit
+# Comparison baseline: exp_stacking_sota_cv.yaml (XGB base + XGB meta)
+# Key question: Does the choice of base learner significantly impact final stacking performance?
+
+exp: stacking
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  type: xgboost
+  test_size: 0.2
+  random_state: 42
+  n_jobs: -1
+  xgb_n_estimators: 900
+  xgb_max_depth: 6
+  xgb_learning_rate: 0.02
+  xgb_subsample: 0.85
+  xgb_colsample_bytree: 0.80
+  xgb_reg_lambda: 1.5
+  xgb_min_child_weight: 1.0
+  xgb_tree_method: hist
+
+stacking:
+  base_model_type: svm
+  meta_model_type: xgboost
+  meta_cv_splits: 5
+
+mofa:
+  factors: 20

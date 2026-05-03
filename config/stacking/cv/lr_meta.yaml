@@ -1,0 +1,42 @@
+# Stacking Variant: XGBoost base with Logistic Regression meta-classifier (tuned)
+# Purpose: Test LR meta with stronger regularization to prevent overfitting on small meta-feature space
+# Difference from exp_stacking.yaml: Uses repeated_cv (5×5) instead of holdout for statistical validity
+# LR hyperparameters: C=0.1 (stronger L2 regularization), multinomial loss, lbfgs solver
+# Expected outcome: Strong performance due to appropriate regularization for 8-dimensional meta-features
+
+exp: stacking
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  type: xgboost
+  test_size: 0.2
+  random_state: 42
+  n_jobs: -1
+  xgb_n_estimators: 1000
+  xgb_max_depth: 5
+  xgb_learning_rate: 0.02
+  xgb_subsample: 0.85
+  xgb_colsample_bytree: 0.80
+  xgb_reg_lambda: 1.5
+  xgb_min_child_weight: 1.0
+  xgb_tree_method: hist
+  logistic_c: 0.1
+  logistic_penalty: l2
+  logistic_solver: lbfgs
+  logistic_max_iter: 2000
+
+stacking:
+  base_model_type: xgboost
+  meta_model_type: logistic
+  meta_cv_splits: 5
+
+mofa:
+  factors: 20

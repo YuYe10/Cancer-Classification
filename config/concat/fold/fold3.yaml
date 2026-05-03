@@ -1,0 +1,29 @@
+# Concat: 3-fold Cross-Validation (aggressive split)
+# Purpose: Test whether fewer folds (larger test sets per fold) change performance estimates
+# Hypothesis: 3-fold gives larger training sets (~67% vs 80% for 5-fold) but higher variance in estimates
+# Comparison baseline: config/concat/cv.yaml (5-fold, same repeats=10)
+# Expected outcome: Slightly lower bias but higher variance; useful for checking robustness of conclusions
+
+exp: concat
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 1000
+  meth_top_var: 1000
+
+model:
+  type: svm
+  test_size: 0.2
+  random_state: 42
+
+evaluation:
+  mode: repeated_cv
+  folds: 3
+  repeats: 10
+
+mofa:
+  factors: 20

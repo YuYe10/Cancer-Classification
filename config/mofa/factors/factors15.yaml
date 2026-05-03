@@ -1,0 +1,23 @@
+# MOFA Factor Sensitivity: 15 latent factors
+# Purpose: Intermediate factor count between conservative and default settings
+# Hypothesis: May offer better bias-variance tradeoff than factors=20 for small sample sizes
+# Comparison baseline: exp_mofa.yaml (factors=20)
+
+exp: mofa
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 1000
+  meth_top_var: 1000
+
+model:
+  type: svm
+  test_size: 0.2
+  random_state: 42
+
+mofa:
+  factors: 15

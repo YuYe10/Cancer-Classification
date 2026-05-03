@@ -1,0 +1,27 @@
+# Class Imbalance Handling: SVM with balanced class weights
+# Purpose: Test whether explicit class balancing improves performance on imbalanced subtypes
+# Context: After dropping HER2 (<2 samples), remaining classes (LumA/LumB/Basal) may still be imbalanced
+# Mechanism: SVM's class_weight='balanced' inversely scales C by class frequency
+# Hypothesis: Balanced weighting should improve macro-F1 for minority classes at possible cost to majority class accuracy
+# Comparison baseline: exp_concat_cv.yaml (SVM with default/unweighted)
+# Key metrics to watch: macro_f1 improvement, per-class recall balance
+
+exp: concat
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 1000
+  meth_top_var: 1000
+
+model:
+  type: svm
+  test_size: 0.2
+  random_state: 42
+  svm_class_weight: balanced
+
+mofa:
+  factors: 20

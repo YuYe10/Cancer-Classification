@@ -84,6 +84,25 @@ def train_random_forest(X_train, y_train, config):
     return model
 
 
+from sklearn.linear_model import LogisticRegression
+
+
+def train_logistic_regression(X_train, y_train, config):
+    """Train Logistic Regression meta-classifier for Stacking."""
+    model_cfg = config.get('model', {})
+    model = LogisticRegression(
+        C=model_cfg.get('logistic_c', 1.0),
+        penalty=model_cfg.get('logistic_penalty', 'l2'),
+        solver=model_cfg.get('logistic_solver', 'lbfgs'),
+        max_iter=model_cfg.get('logistic_max_iter', 1000),
+        multi_class='multinomial',
+        random_state=model_cfg.get('random_state', 42),
+        n_jobs=model_cfg.get('n_jobs', -1),
+    )
+    model.fit(X_train, y_train)
+    return model
+
+
 def train_classifier(X_train, y_train, config, model_type=None):
     model_cfg = config.get('model', {})
     resolved_type = (model_type or model_cfg.get('type', 'svm')).lower()
@@ -94,6 +113,8 @@ def train_classifier(X_train, y_train, config, model_type=None):
         return train_xgboost(X_train, y_train, config)
     if resolved_type in {'rf', 'random_forest'}:
         return train_random_forest(X_train, y_train, config)
+    if resolved_type in {'logistic', 'logistic_regression', 'lr'}:
+        return train_logistic_regression(X_train, y_train, config)
 
     raise ValueError(f"Unknown model type: {resolved_type}")
 

@@ -1,0 +1,31 @@
+# Class Imbalance Handling: Random Forest with balanced subsample weights
+# Purpose: Test whether bootstrap-balanced RF improves subtype classification fairness
+# Mechanism: class_weight='balanced_subsample' computes weights based on bootstrap sample frequencies each tree
+# Difference from 'balanced': Weights are recomputed per bootstrap, adapting to sampling variation
+# Hypothesis: More robust than static 'balanced' weighting; may improve minority class detection
+# Comparison baseline: exp_concat_rf_cv.yaml (RF without class_weight)
+
+exp: concat
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  type: random_forest
+  test_size: 0.2
+  random_state: 42
+  rf_n_estimators: 800
+  rf_max_depth: null
+  rf_min_samples_split: 2
+  rf_min_samples_leaf: 1
+  rf_max_features: sqrt
+  rf_class_weight: balanced
+
+mofa:
+  factors: 20

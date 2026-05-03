@@ -8,9 +8,15 @@
 
 \subsection{方法差异的解释}
 
-本轮结果显示Concat的均值最高，RNA-only与Stacking次之，MOFA波动最大。四种方法形成由浅入深的融合链条：RNA-only提供单组学基线，Concat引入跨模态互补，MOFA在潜空间压缩冗余，Stacking在决策层进一步融合。该排序说明"跨组学互补"已在当前数据上体现，但"复杂融合"不必然带来稳定增益。
+本轮结果显示 Concat 的均值最高，RNA-only 与 MOFA 次之，Stacking 表现最弱。六种方法形成由浅入深的融合链条：RNA-only 提供单组学基线，Meth-only 验证甲基化独立分类能力，Concat 引入跨模态互补，MOFA 在潜空间压缩冗余，Stacking 在决策层进一步融合。该排序说明"跨组学互补"已在当前数据上体现，但"复杂融合"不必然带来稳定增益。
 
-这一发现与多组学融合研究中的"简单方法优势"（simplicity advantage）现象一致。在小样本高维场景下，复杂模型通常具有更多可学习参数，导致过拟合风险增加。Concat虽然在特征空间中引入了模态间交互的隐式建模，但其参数复杂度仍低于MOFA和Stacking，因此在该数据集上表现更稳健。
+这一发现与多组学融合研究中的"简单方法优势"（simplicity advantage）现象一致。在小样本高维场景下，复杂模型通常具有更多可学习参数，导致过拟合风险增加。Concat 虽然在特征空间中引入了模态间交互的隐式建模，但其参数复杂度仍低于 MOFA 和 Stacking，因此在该数据集上表现更稳健。
+
+从统计学习理论角度，这一现象可由偏差-方差权衡解释：
+\[
+\mathbb{E}[(y - \hat{f}(x))^2] = \underbrace{(\mathbb{E}[\hat{f}(x)] - f(x))^2}_{\text{Bias}^2} + \underbrace{\mathbb{E}[(\hat{f}(x) - \mathbb{E}[\hat{f}(x)])^2]}_{\text{Variance}} + \underbrace{\sigma^2}_{\text{Noise}}
+\]
+Stacking 虽然降低了偏差，但方差显著增大，导致总体误差上升。
 
 \subsection{为什么严格CV是主结论口径}
 

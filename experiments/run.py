@@ -1,4 +1,5 @@
 import argparse
+import copy
 import csv
 import json
 from datetime import datetime
@@ -6,6 +7,39 @@ from pathlib import Path
 
 import yaml
 from src.pipeline import run_pipeline
+
+
+def _deep_merge(base, override):
+    result = copy.deepcopy(base)
+    for key, value in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = _deep_merge(result[key], value)
+        else:
+            result[key] = value
+    return result
+
+
+def _resolve_config(config_path):
+    """Load experiment config, merging shared evaluation defaults."""
+    config_abs = Path(config_path).resolve()
+    with open(config_abs, encoding="utf-8") as handle:
+        config = yaml.safe_load(handle)
+
+    current = config_abs.parent
+    shared_eval = None
+    while current != current.parent:
+        candidate = current / "shared" / "evaluation.yaml"
+        if candidate.exists():
+            shared_eval = candidate
+            break
+        current = current.parent
+
+    if shared_eval is not None:
+        with open(shared_eval, encoding="utf-8") as handle:
+            shared = yaml.safe_load(handle)
+        config = _deep_merge(shared, config)
+
+    return config
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--config", type=str, required=True)
@@ -15,8 +49,7 @@ parser.add_argument("--no-save", action="store_true")
 
 args = parser.parse_args()
 
-with open(args.config, encoding="utf-8") as handle:
-    config = yaml.safe_load(handle)
+config = _resolve_config(args.config)
 
 metrics = run_pipeline(config)
 
@@ -75,6 +108,7 @@ def _to_scalar_row(config_path, tag_name, run_timestamp, metrics_dict):
         "fold_count": metrics_dict.get("fold_count"),
         "base_model_type": metrics_dict.get("base_model_type"),
         "meta_model_type": metrics_dict.get("meta_model_type"),
+        "variant": metrics_dict.get("variant", ""),
     }
     return scalar_row
 

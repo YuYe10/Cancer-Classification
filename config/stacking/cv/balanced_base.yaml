@@ -1,0 +1,41 @@
+# Stacking + Class Balance: SVM base models with balanced weights, XGB meta
+# Purpose: End-to-end test of class balancing within stacking framework
+# Rationale: If base models produce better-calibrated probabilities for minority classes via balanced training,
+#            the meta-classifier should benefit from more informative meta-features across all classes
+# Expected outcome: Improved per-class F1 scores compared to unbalanced exp_stacking_sota_cv.yaml,
+#                   especially for Basal-like (often smallest class after HER2 exclusion)
+# Analysis focus: Compare confusion matrix diagonal entries for each subtype vs baseline
+
+exp: stacking
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 2000
+  meth_top_var: 2000
+
+model:
+  type: xgboost
+  test_size: 0.2
+  random_state: 42
+  n_jobs: -1
+  xgb_n_estimators: 900
+  xgb_max_depth: 6
+  xgb_learning_rate: 0.02
+  xgb_subsample: 0.85
+  xgb_colsample_bytree: 0.80
+  xgb_reg_lambda: 1.5
+  xgb_min_child_weight: 1.0
+  xgb_tree_method: hist
+  svm_class_weight: balanced
+
+stacking:
+  base_model_type: svm
+  meta_model_type: xgboost
+  meta_cv_splits: 5
+
+mofa:
+  factors: 20

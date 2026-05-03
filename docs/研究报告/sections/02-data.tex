@@ -45,3 +45,42 @@ RNA-seq 数据在本研究中承担最基础的功能表达信息角色。转录
 这种编码方式使监督学习模型能够直接处理分类目标。同时，在报告结果时仍建议保留原始亚型名称与数值标签的对应说明，以便读者理解分类结果。
 
 在当前对齐后的样本集中，HER2 类别样本数不足 2，按照统一规则被自动剔除并记录为 \texttt{dropped\_labels}。因此本轮主结果的有效分类空间为 LumA / LumB / Basal 三类。
+
+\subsection{样本分布统计}
+
+对齐后的样本分布如表~\ref{tab:sample-distribution} 所示：
+
+\begin{table}[H]
+\centering
+\caption{对齐后样本分布统计}
+\label{tab:sample-distribution}
+\begin{tabular}{lcc}
+\toprule
+\textbf{亚型} & \textbf{样本数} & \textbf{占比} \\
+\midrule
+LumA & 45 & 30.0\% \\
+LumB & 52 & 34.7\% \\
+Basal & 45 & 30.0\% \\
+HER2 (已剔除) & $<$2 & $<$1.3\% \\
+\midrule
+\textbf{总计} & \textbf{150} & \textbf{100\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% [图表占位符] 样本分布饼图
+% 图表类型: 饼图 (Pie Chart)
+% 数据来源: datasets/brca_pam50.csv 对齐后统计
+% 预期展示内容: 展示 LumA、LumB、Basal 三类样本的比例分布
+\begin{figure}[H]
+\centering
+\fbox{\parbox{0.6\linewidth}{\centering\vspace{3cm}
+\texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
+\textbf{图: 样本亚型分布饼图}\\[0.5em]
+类型: 饼图\\
+数据源: datasets/brca\_pam50.csv\\
+内容: LumA / LumB / Basal 三类样本占比
+\vspace{3cm}}}
+\caption{对齐后样本的 PAM50 亚型分布。}
+\label{fig:sample-pie}
+\end{figure}

@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.model_selection import RepeatedStratifiedKFold, StratifiedKFold, train_test_split
 import copy
+from tqdm import tqdm
 
 from src.data.loader import load_data
 from src.data.align import align_samples
@@ -19,6 +20,26 @@ LABEL_MAP = {
 INV_LABEL_MAP = {v: k for k, v in LABEL_MAP.items()}
 
 
+def _derive_experiment_variant(config):
+    ablation = config.get('ablation', {})
+    if not ablation.get('use_feature_selection', True) and ablation.get('use_rna', True) and ablation.get('use_meth', True):
+        return 'no_feature_selection'
+    if not ablation.get('use_rna', True) and ablation.get('use_meth', True):
+        return 'ablation_no_rna'
+    if not ablation.get('use_meth', True) and ablation.get('use_rna', True):
+        return 'ablation_no_meth'
+    model_cfg = config.get('model', {})
+    if model_cfg.get('svm_class_weight') == 'balanced' or model_cfg.get('rf_class_weight') == 'balanced':
+        return 'class_balanced'
+    stacking = config.get('stacking', {})
+    exp_type = config.get('exp', 'rna')
+    if exp_type == 'stacking':
+        base = stacking.get('base_model_type', 'xgboost')
+        meta = stacking.get('meta_model_type', 'xgboost')
+        return 'stacking_{}_{}'.format(base, meta)
+    return 'baseline'
+
+
 def run_pipeline(config):
     """
     Main pipeline with data leakage prevention.
@@ -30,96 +51,125 @@ def run_pipeline(config):
     4. Transform both train and test with fitted preprocessors
     5. Train and evaluate model
     """
-    
-    # Step 1: Load and align data
-    rna, meth, clinical = load_data(config)
-    rna, meth, clinical = align_samples(rna, meth, clinical)
-    
-    ablation_mode = config.get('ablation', {})
-    use_rna = ablation_mode.get('use_rna', True)
-    use_meth = ablation_mode.get('use_meth', True)
-    use_feature_selection = ablation_mode.get('use_feature_selection', True)
-    
-    # Extract labels
-    y = clinical['label'].map(LABEL_MAP)
-    if y.isna().any():
-        unknown_labels = sorted(clinical.loc[y.isna(), 'label'].unique())
-        raise ValueError(f"Unknown clinical labels found: {unknown_labels}")
-
+    exp_type = config.get('exp', 'rna')
     evaluation_cfg = config.get('evaluation', {})
     evaluation_mode = evaluation_cfg.get('mode', 'holdout')
+    variant = _derive_experiment_variant(config)
+    config['_variant'] = variant
+    
+    with tqdm(total=4, desc=f"[{exp_type.upper()}] Pipeline", unit="step", dynamic_ncols=True) as pipeline_pbar:
+        
+        pipeline_pbar.set_postfix_str("loading data")
+        # Step 1: Load and align data
+        rna, meth, clinical = load_data(config)
+        rna, meth, clinical = align_samples(rna, meth, clinical)
+        pipeline_pbar.update(1)
+        
+        ablation_mode = config.get('ablation', {})
+        use_rna = ablation_mode.get('use_rna', True)
+        use_meth = ablation_mode.get('use_meth', True)
+        use_feature_selection = ablation_mode.get('use_feature_selection', True)
+        
+        pipeline_pbar.set_postfix_str("extracting labels")
+        # Extract labels
+        y = clinical['label'].map(LABEL_MAP)
+        if y.isna().any():
+            unknown_labels = sorted(clinical.loc[y.isna(), 'label'].unique())
+            raise ValueError(f"Unknown clinical labels found: {unknown_labels}")
 
-    rna, meth, clinical, y, dropped_labels = _drop_rare_classes(
-        rna=rna,
-        meth=meth,
-        clinical=clinical,
-        y=y,
-        min_count=2,
-    )
-
-    if evaluation_mode in {'cv', 'repeated_cv'}:
-        metrics = _run_cross_validation(
+        rna, meth, clinical, y, dropped_labels = _drop_rare_classes(
             rna=rna,
             meth=meth,
+            clinical=clinical,
             y=y,
-            config=config,
-            use_rna=use_rna,
-            use_meth=use_meth,
-            use_feature_selection=use_feature_selection,
-            evaluation_cfg=evaluation_cfg,
+            min_count=2,
         )
-        metrics['dropped_labels'] = dropped_labels
-        return metrics
-    
-    # Step 2: Split into train/test BEFORE preprocessing
-    stratify_target = y if y.value_counts().min() >= 2 else None
-    X_rna_train, X_rna_test, X_meth_train, X_meth_test, y_train, y_test = train_test_split(
-        rna.T, meth.T, y,
-        test_size=config['model']['test_size'],
-        random_state=config['model']['random_state'],
-        stratify=stratify_target,
-    )
-    # Transpose back to feature x sample shape for preprocessing
-    X_rna_train = X_rna_train.T
-    X_rna_test = X_rna_test.T
-    X_meth_train = X_meth_train.T
-    X_meth_test = X_meth_test.T
-    
-    exp_type = config.get('exp', 'rna')
-    if exp_type == 'stacking':
-        return _run_stacking_holdout(
+        pipeline_pbar.update(1)
+
+        if evaluation_mode in {'cv', 'repeated_cv'}:
+            pipeline_pbar.set_postfix_str("running CV")
+            metrics = _run_cross_validation(
+                rna=rna,
+                meth=meth,
+                y=y,
+                config=config,
+                use_rna=use_rna,
+                use_meth=use_meth,
+                use_feature_selection=use_feature_selection,
+                evaluation_cfg=evaluation_cfg,
+            )
+            pipeline_pbar.update(1)
+            pipeline_pbar.set_postfix_str("done")
+            pipeline_pbar.close()
+            metrics['dropped_labels'] = dropped_labels
+            metrics['variant'] = variant
+            return metrics
+        
+        pipeline_pbar.set_postfix_str("splitting data")
+        # Step 2: Split into train/test BEFORE preprocessing
+        stratify_target = y if y.value_counts().min() >= 2 else None
+        X_rna_train, X_rna_test, X_meth_train, X_meth_test, y_train, y_test = train_test_split(
+            rna.T, meth.T, y,
+            test_size=config['model']['test_size'],
+            random_state=config['model']['random_state'],
+            stratify=stratify_target,
+        )
+        # Transpose back to feature x sample shape for preprocessing
+        X_rna_train = X_rna_train.T
+        X_rna_test = X_rna_test.T
+        X_meth_train = X_meth_train.T
+        X_meth_test = X_meth_test.T
+        pipeline_pbar.update(1)
+        
+        exp_type_resolved = exp_type
+        if exp_type == 'stacking':
+            pipeline_pbar.set_postfix_str("stacking holdout")
+            result = _run_stacking_holdout(
+                X_rna_train=X_rna_train,
+                X_rna_test=X_rna_test,
+                X_meth_train=X_meth_train,
+                X_meth_test=X_meth_test,
+                y_train=y_train,
+                y_test=y_test,
+                config=config,
+                use_rna=use_rna,
+                use_meth=use_meth,
+                use_feature_selection=use_feature_selection,
+            )
+            pipeline_pbar.update(1)
+            pipeline_pbar.set_postfix_str("done")
+            pipeline_pbar.close()
+            result['variant'] = variant
+            return result
+
+        pipeline_pbar.set_postfix_str("building features")
+        X_train, X_test = _build_feature_matrices(
             X_rna_train=X_rna_train,
             X_rna_test=X_rna_test,
             X_meth_train=X_meth_train,
             X_meth_test=X_meth_test,
-            y_train=y_train,
-            y_test=y_test,
             config=config,
             use_rna=use_rna,
             use_meth=use_meth,
             use_feature_selection=use_feature_selection,
+            exp_type=exp_type_resolved,
+            allow_mofa_full_fit=True,
         )
-
-    X_train, X_test = _build_feature_matrices(
-        X_rna_train=X_rna_train,
-        X_rna_test=X_rna_test,
-        X_meth_train=X_meth_train,
-        X_meth_test=X_meth_test,
-        config=config,
-        use_rna=use_rna,
-        use_meth=use_meth,
-        use_feature_selection=use_feature_selection,
-        exp_type=exp_type,
-        allow_mofa_full_fit=True,
-    )
-
-    model = train_model(X_train, y_train, config)
-    metrics = evaluate(model, X_test, y_test, labels=list(LABEL_MAP.values()))
-    metrics['mode'] = 'holdout'
-    metrics['train_size'] = len(y_train)
-    metrics['test_size'] = len(y_test)
-    metrics['dropped_labels'] = dropped_labels
-    return metrics
+        pipeline_pbar.update(1)
+        
+        pipeline_pbar.set_postfix_str("training model")
+        model = train_model(X_train, y_train, config)
+        metrics = evaluate(model, X_test, y_test, labels=list(LABEL_MAP.values()))
+        metrics['mode'] = 'holdout'
+        metrics['exp'] = exp_type
+        metrics['variant'] = variant
+        metrics['train_size'] = len(y_train)
+        metrics['test_size'] = len(y_test)
+        metrics['dropped_labels'] = dropped_labels
+        pipeline_pbar.update(1)
+        pipeline_pbar.set_postfix_str("done")
+        pipeline_pbar.close()
+        return metrics
 
 
 def _drop_rare_classes(rna, meth, clinical, y, min_count=2):
@@ -302,7 +352,15 @@ def _run_cross_validation(rna, meth, y, config, use_rna, use_meth, use_feature_s
         splitter = StratifiedKFold(n_splits=effective_splits, shuffle=True, random_state=random_state)
 
     fold_metrics = []
-    for fold_id, (train_idx, test_idx) in enumerate(splitter.split(np.zeros(len(y)), y), start=1):
+    total_folds = n_splits * n_repeats if n_repeats > 1 else effective_splits
+    pbar = tqdm(
+        splitter.split(np.zeros(len(y)), y),
+        total=total_folds,
+        desc=f"[{exp_type.upper()}] CV Folds",
+        unit="fold",
+        dynamic_ncols=True,
+    )
+    for fold_id, (train_idx, test_idx) in enumerate(pbar, start=1):
         X_rna_train = rna.iloc[:, train_idx]
         X_rna_test = rna.iloc[:, test_idx]
         X_meth_train = meth.iloc[:, train_idx]
@@ -331,6 +389,7 @@ def _run_cross_validation(rna, meth, y, config, use_rna, use_meth, use_feature_s
                 config=config,
                 y_train=y_train,
                 meta_cv_splits=stacking_cfg.get('meta_cv_splits', 5),
+                outer_pbar=pbar,
             )
             model = _fit_named_model(meta_train, y_train, config, model_type=meta_model_type)
             fold_result = evaluate(model, meta_test, y_test, labels=list(LABEL_MAP.values()))
@@ -338,6 +397,7 @@ def _run_cross_validation(rna, meth, y, config, use_rna, use_meth, use_feature_s
             fold_result['base_model_type'] = base_model_type
             fold_result['meta_model_type'] = meta_model_type
             fold_metrics.append(fold_result)
+            pbar.set_postfix_str("done")
             continue
 
         X_train, X_test = _build_feature_matrices(
@@ -361,6 +421,7 @@ def _run_cross_validation(rna, meth, y, config, use_rna, use_meth, use_feature_s
     summary = summarize_cv_metrics(fold_metrics)
     summary['mode'] = 'cv'
     summary['exp'] = exp_type
+    summary['variant'] = config.get('_variant', 'baseline')
     summary['fold_count'] = len(fold_metrics)
     summary['requested_folds'] = n_splits
     summary['effective_folds'] = effective_splits
@@ -450,7 +511,7 @@ def _fit_named_model(X, y, config, model_type=None):
     return train_classifier(X, y, config_copy, model_type=model_type)
 
 
-def _build_meta_features_from_views(view_map, model_type, config, y_train, meta_cv_splits=5):
+def _build_meta_features_from_views(view_map, model_type, config, y_train, meta_cv_splits=5, outer_pbar=None):
     class_counts = y_train.value_counts()
     inner_splits = min(meta_cv_splits, class_counts.min())
     if inner_splits < 2:
@@ -460,17 +521,29 @@ def _build_meta_features_from_views(view_map, model_type, config, y_train, meta_
 
     splitter = StratifiedKFold(n_splits=inner_splits, shuffle=True, random_state=config['model']['random_state'])
     meta_train_parts = []
+    total_views = len(view_map)
 
-    for view_name in sorted(view_map.keys()):
+    for view_idx, view_name in enumerate(sorted(view_map.keys())):
         X_view_train, _ = view_map[view_name]
         oof_proba = np.zeros((X_view_train.shape[0], len(target_labels)))
-        for inner_train_idx, inner_val_idx in splitter.split(X_view_train, y_train):
-            base_model = _fit_named_model(X_view_train[inner_train_idx], y_train.iloc[inner_train_idx], config, model_type=model_type)
-            oof_proba[inner_val_idx] = _predict_proba_or_transform(
-                base_model,
-                X_view_train[inner_val_idx],
-                target_labels=target_labels,
-            )
+        inner_desc = f"  └─[{view_name.upper()}] Inner CV ({inner_splits}-fold)"
+        with tqdm(
+            splitter.split(X_view_train, y_train),
+            total=inner_splits,
+            desc=inner_desc,
+            unit="fold",
+            leave=False,
+            dynamic_ncols=True,
+        ) as inner_pbar:
+            for inner_train_idx, inner_val_idx in inner_pbar:
+                base_model = _fit_named_model(X_view_train[inner_train_idx], y_train.iloc[inner_train_idx], config, model_type=model_type)
+                oof_proba[inner_val_idx] = _predict_proba_or_transform(
+                    base_model,
+                    X_view_train[inner_val_idx],
+                    target_labels=target_labels,
+                )
+                if outer_pbar is not None:
+                    outer_pbar.set_postfix_str(f"inner={view_name}")
         meta_train_parts.append(oof_proba)
 
     meta_train = np.concatenate(meta_train_parts, axis=1)
@@ -515,6 +588,7 @@ def _run_stacking_holdout(X_rna_train, X_rna_test, X_meth_train, X_meth_test, y_
     metrics = evaluate(meta_model, meta_test, y_test, labels=list(LABEL_MAP.values()))
     metrics['mode'] = 'holdout'
     metrics['exp'] = 'stacking'
+    metrics['variant'] = config.get('_variant', 'stacking_{}_{}'.format(base_model_type, meta_model_type))
     metrics['base_model_type'] = base_model_type
     metrics['meta_model_type'] = meta_model_type
     return metrics

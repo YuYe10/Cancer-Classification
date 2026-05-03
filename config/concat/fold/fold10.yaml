@@ -1,0 +1,30 @@
+# Concat: 10-fold Cross-Validation (conservative split)
+# Purpose: Test whether more folds (smaller test sets per fold) produce tighter confidence intervals
+# Hypothesis: 10-fold gives smaller training sets (~90% vs 80% for 5-fold) but lower variance across folds
+# Trade-off: More stable estimates but each model sees less data; may slightly underperform vs 5-fold
+# Risk warning: With ~150 samples and 4 classes, some rare classes may have <15 samples in 10% test sets
+# Comparison baseline: config/concat/cv.yaml (5-fold)
+
+exp: concat
+
+data:
+  rna_path: datasets/TCGA-BRCA.star_counts.csv
+  meth_path: datasets/TCGA-BRCA.methylation450.csv
+  clinical_path: datasets/brca_pam50.csv
+
+preprocess:
+  rna_top_var: 1000
+  meth_top_var: 1000
+
+model:
+  type: svm
+  test_size: 0.2
+  random_state: 42
+
+evaluation:
+  mode: repeated_cv
+  folds: 10
+  repeats: 10
+
+mofa:
+  factors: 20

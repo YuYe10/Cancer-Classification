@@ -11,3 +11,4 @@ pyyaml
 scipy
 statsmodels
 gseapy
+tqdm

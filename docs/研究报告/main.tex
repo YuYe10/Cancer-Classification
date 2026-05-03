@@ -32,6 +32,50 @@
 
 \maketitle
 
+\section*{公式符号表}
+
+为便于阅读，本文统一使用以下数学符号与变量定义：
+
+\begin{table}[H]
+\centering
+\caption{公式符号与变量定义}
+\label{tab:symbols}
+\begin{tabular}{cl}
+\toprule
+\textbf{符号} & \textbf{含义} \\
+\midrule
+$X^{(r)}$ & RNA-seq 表达矩阵，维度 $p_r \times n$ \\
+$X^{(m)}$ & DNA 甲基化矩阵，维度 $p_m \times n$ \\
+$Z^{(r)}, Z^{(m)}$ & 预处理后 RNA / 甲基化特征矩阵 \\
+$Z^{(c)}$ & Concat 融合后的拼接特征矩阵 \\
+$W$ & MOFA 潜变量矩阵（因子得分） \\
+$A^{(r)}, A^{(m)}$ & MOFA 权重矩阵（因子载荷） \\
+$q$ & MOFA 潜在因子数 \\
+$H$ & Stacking 元特征矩阵（OOF 概率拼接） \\
+$n$ & 样本总数 \\
+$p$ & 特征维度总数 \\
+$K$ & 高方差特征筛选后保留的特征数 \\
+$k$ & 类别索引（$k=1,2,\dots,C$） \\
+$C$ & 类别总数（本文中 $C=3$） \\
+$\mu, \sigma$ & 均值、标准差 \\
+$\mathrm{CI}_{95}$ & 95\% 置信区间 \\
+$\mathrm{Acc}$ & 准确率（Accuracy） \\
+$\mathrm{Bal\_Acc}$ & 平衡准确率（Balanced Accuracy） \\
+$\mathrm{F1}$ & F1 分数 \\
+$\mathrm{Macro\text{-}F1}$ & 宏平均 F1 分数 \\
+$\mathrm{TP}_k, \mathrm{FP}_k, \mathrm{FN}_k$ & 第 $k$ 类的真阳性、假阳性、假阴性 \\
+$\mathcal{L}$ & 损失函数 \\
+$\lambda$ & 正则化系数 \\
+$\Omega(\cdot)$ & 稀疏或先验约束项 \\
+$\mathbf{w}, b$ & SVM 权重向量与偏置项 \\
+$\xi_i$ & SVM 松弛变量 \\
+$\phi(\cdot)$ & 核映射函数 \\
+$\mathrm{Var}(x_j)$ & 第 $j$ 个特征的样本方差 \\
+$\hat{P}^{oof}$ & Out-of-fold 概率预测 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \begin{abstract}
 我们围绕课程任务"单癌种（BRCA）内部的分子亚型分类"完成了可复现的多组学实验。基于 TCGA-BRCA 的 RNA-seq、DNA 甲基化与 PAM50 标签，我们在统一 repeated stratified CV（5 folds $\times$ 10 repeats）口径下比较了 RNA-only、Concat、MOFA 和 Stacking 四条主线。为保证公平性，特征筛选、标准化、MOFA 拟合与 Stacking 元特征构造均严格限定在训练折内，测试折仅用于独立推断。
 
