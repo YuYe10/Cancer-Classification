@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 import numpy as np
 import pandas as pd
-from academic_figure_generator import (
+from scripts.archive.academic_figure_generator import (
     DataReader,
     ChartGenerator,
     OutputManager,
