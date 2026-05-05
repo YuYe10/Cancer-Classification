@@ -16,13 +16,27 @@ RNA-seq 数据在本研究中承担最基础的功能表达信息角色。转录
 
 甲基化数据反映的是 CpG 位点上的表观遗传状态，其维度更高，典型平台（如 Illumina 450K）可能包含数十万条 probe。与 RNA 不同，甲基化数据的解释通常更偏向调控层面：某些启动子区域的甲基化升高可能导致相关基因沉默，而不同亚型在甲基化谱上的差异往往反映其调控机制的变化。
 
-由于甲基化数据极高维且稀疏，若直接进入分类器，很容易出现严重过拟合。因此本研究同样采用高方差筛选策略，只保留最具区分度的 probe。当前代码中，甲基化预处理会先删除缺失值，再按方差排序保留 Top-K 特征。该策略虽然简单，但在当前中小样本实验中具有较高的可操作性。
+由于甲基化数据极高维且稀疏，若直接进入分类器，很容易出现严重过拟合。因此本研究同样采用高方差筛选策略，只保留最具区分度的 probe。当前代码中，甲基化预处理会先删除缺失值，再按方差排序保留 Top-K 特征。该策略虽然简单，但在当前中小样本实验中具有较高的可操作性。高方差筛选前后 RNA 和甲基化特征的分布对比如图~\ref{fig:feature-distribution} 所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{../../outputs/figures/chapter2/fig3_feature_distribution.png}
+\caption{高方差筛选前后 RNA 和甲基化特征分布对比。左侧为原始特征分布，右侧为筛选后前 $K$ 个高方差特征的分布形态。高方差特征筛选通过保留样本间波动最大的特征，有效去除噪声维度。}
+\label{fig:feature-distribution}
+\end{figure}
 
 \subsection{临床标签与样本对齐}
 
 多组学分类任务最容易出错的环节不是模型，而是样本对齐。RNA、甲基化与临床标签文件必须对应同一批样本，否则模型学到的只是“错位后的噪声关系”。当前仓库中临床文件采用 TSV 格式，且存在重复样本和标签命名不完全一致的问题，因此在数据加载阶段需要做格式统一：一方面将 \texttt{PAM50} 映射为 \texttt{label}，另一方面将 \texttt{Her2} 统一为 \texttt{HER2}。
 
-样本对齐时，当前实现采用三者样本交集，并保持 RNA 列顺序作为最终对齐顺序，从而保证多个组学在同一个样本索引上进行建模。这个设计避免了集合交集带来的无序问题，也减少了后续拼接或 MOFA 输入阶段的错位风险。
+样本对齐时，当前实现采用三者样本交集，并保持 RNA 列顺序作为最终对齐顺序，从而保证多个组学在同一个样本索引上进行建模。这个设计避免了集合交集带来的无序问题，也减少了后续拼接或 MOFA 输入阶段的错位风险。三方样本对齐的可视化结果如图~\ref{fig:sample-alignment} 所示。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\linewidth]{../../outputs/figures/chapter2/fig4_sample_alignment.png}
+\caption{RNA-seq、DNA 甲基化与临床标签三方样本对齐结果。对齐采用样本交集策略，以 RNA 列顺序为基准，确保多组学矩阵在同一索引上建模，避免因对齐错位导致的信息混淆。}
+\label{fig:sample-alignment}
+\end{figure}
 
 \subsection{训练-测试划分与防泄露原则}
 
@@ -30,7 +44,14 @@ RNA-seq 数据在本研究中承担最基础的功能表达信息角色。转录
 
 为降低这种风险，我们采用“先切分、后拟合”的严格流程。具体来说，在每个外层 fold 内先完成训练/测试划分，再仅用训练折完成特征筛选与标准化拟合，最后把同一预处理器应用到测试折。MOFA 分支也采用“训练折拟合 + 测试折投影”，不把测试样本混入因子学习。
 
-该实现保证了四种方法在同一防泄露口径下比较，减少了由预处理顺序导致的性能高估风险。
+整体预处理管道如图~\ref{fig:preprocessing-pipeline} 所示，该实现保证了四种方法在同一防泄露口径下比较，减少了由预处理顺序导致的性能高估风险。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{../../outputs/figures/chapter2/fig2_data_preprocessing_pipeline.png}
+\caption{数据预处理管道流程。涵盖 RNA-seq 对数变换与甲基化缺失值处理、均值过滤、方差排序及标准化等关键步骤。预处理顺序严格遵循防泄露原则，所有参数估计均在训练折内完成。}
+\label{fig:preprocessing-pipeline}
+\end{figure}
 
 \subsection{标签映射}
 
@@ -46,9 +67,9 @@ RNA-seq 数据在本研究中承担最基础的功能表达信息角色。转录
 
 在当前对齐后的样本集中，HER2 类别样本数不足 2，按照统一规则被自动剔除并记录为 \texttt{dropped\_labels}。因此本轮主结果的有效分类空间为 LumA / LumB / Basal 三类。
 
-\subsection{样本分布统计}
+对齐后的样本分布如表~\ref{tab:sample-distribution}所示，其可视化结果如图~\ref{fig:sample-pie}所示。
 
-对齐后的样本分布如表~\ref{tab:sample-distribution} 所示：
+\subsection{样本分布统计}
 
 \begin{table}[H]
 \centering
@@ -68,19 +89,9 @@ HER2 (已剔除) & $<$2 & $<$1.3\% \\
 \end{tabular}
 \end{table}
 
-% [图表占位符] 样本分布饼图
-% 图表类型: 饼图 (Pie Chart)
-% 数据来源: datasets/brca_pam50.csv 对齐后统计
-% 预期展示内容: 展示 LumA、LumB、Basal 三类样本的比例分布
 \begin{figure}[H]
 \centering
-\fbox{\parbox{0.6\linewidth}{\centering\vspace{3cm}
-\texttt{[FIGURE PLACEHOLDER]}\\[0.5em]
-\textbf{图: 样本亚型分布饼图}\\[0.5em]
-类型: 饼图\\
-数据源: datasets/brca\_pam50.csv\\
-内容: LumA / LumB / Basal 三类样本占比
-\vspace{3cm}}}
-\caption{对齐后样本的 PAM50 亚型分布。}
+\includegraphics[width=0.65\linewidth]{../../outputs/figures/chapter2/fig1_sample_subtype_distribution.png}
+\caption{对齐后样本的 PAM50 亚型分布。数据来源：TCGA-BRCA PAM50 临床标签，对齐后共 150 例有效样本（LumA/LumB/Basal 三类）。}
 \label{fig:sample-pie}
 \end{figure}

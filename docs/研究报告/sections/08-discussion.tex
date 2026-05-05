@@ -2,26 +2,47 @@
 
 \subsection{方法差异的深层解释与理论视角}
 
-本轮实验结果显示Concat-SVM的均值最高，RNA-only与MOFA紧随其后，Stacking表现最弱。这六种方法形成由浅入深的融合链条：RNA-only提供单组学基线，Meth-only验证甲基化独立分类能力，Concat引入跨模态互补，MOFA在潜空间压缩冗余，Stacking在决策层进一步融合。该排序说明"跨组学互补"已在当前数据上得到验证，但"复杂融合"并不必然带来稳定增益。
+本轮实验结果显示Concat-SVM的均值最高，RNA-only与MOFA紧随其后，Stacking表现最弱。这六种方法形成由浅入深的融合链条：RNA-only提供单组学基线，Meth-only验证甲基化独立分类能力，Concat引入跨模态互补，MOFA在潜空间压缩冗余，Stacking在决策层进一步融合。该排序说明"跨组学互补"已在当前数据上得到验证，但"复杂融合"并不必然带来稳定增益——模型复杂度与性能的关系并非单调递增，而是呈现倒 U 型曲线（见图~\ref{fig:complexity-vs-performance}）。
 
-这一发现与多组学融合研究中的"简单方法优势"（simplicity advantage）现象高度一致。在小样本高维场景下，复杂模型通常具有更多可学习参数，导致过拟合风险显著增加。Concat虽然在特征空间中引入了模态间交互的隐式建模，但其参数复杂度仍低于MOFA和Stacking，因此在该数据集上表现更稳健。从统计学习理论角度，这一现象可由偏差-方差权衡（Bias-Variance Tradeoff）框架解释：
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{../../outputs/figures/chapter8/fig1_bias_variance_tradeoff.png}
+\caption{偏差-方差权衡分析。在小样本高维场景（$n \approx 150$，$p \gg n$）下，复杂模型（Stacking）虽然偏差较低，但方差显著增大，导致总体泛化误差上升；简单模型（Concat-SVM）通过限制模型复杂度，实现了更优的偏差-方差权衡。}
+\label{fig:bias-variance-tradeoff}
+\end{figure}
+
+这一发现与多组学融合研究中的"简单方法优势"（simplicity advantage）现象高度一致。在小样本高维场景下，复杂模型通常具有更多可学习参数，导致过拟合风险显著增加。Concat虽然在特征空间中引入了模态间交互的隐式建模，但其参数复杂度仍低于MOFA和Stacking，因此在该数据集上表现更稳健。从统计学习理论角度，这一现象可由偏差-方差权衡（Bias-Variance Tradeoff）框架解释（实证分析见图~\ref{fig:bias-variance-tradeoff}）：
 \[
 \mathbb{E}[(y - \hat{f}(x))^2] = \underbrace{(\mathbb{E}[\hat{f}(x)] - f(x))^2}_{\text{Bias}^2} + \underbrace{\mathbb{E}[(\hat{f}(x) - \mathbb{E}[\hat{f}(x)])^2]}_{\text{Variance}} + \underbrace{\sigma^2}_{\text{Noise}}.
 \]
 
 Stacking虽然通过两层模型降低了偏差，但方差显著增大，导致总体误差上升。在当前样本规模（$n \approx 150$）下，Stacking的元特征维度仅为6（$C=3$类 $\times$ $V=2$视图），元学习器在如此低维空间中极易过拟合，无法有效学习基模型预测的互补模式。相比之下，Concat-SVM直接在约4000维拼接特征空间上学习线性决策边界，虽然偏差略高，但方差控制得当，实现了更优的偏差-方差权衡。
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{../../outputs/figures/chapter8/fig2_complexity_vs_performance.png}
+\caption{模型复杂度与分类性能关系分析。横轴为模型复杂度的递增顺序（RNA-only $\to$ Concat $\to$ MOFA $\to$ Stacking），纵轴为 Macro-F1 分数。Concat-SVM 位于性能最优区，Stacking 反而出现性能下降，呈现倒 U 型曲线，验证了“适度复杂度最优”的偏差-方差权衡规律。}
+\label{fig:complexity-vs-performance}
+\end{figure}
+
 \subsection{失败案例深度分析：Stacking的系统性欠拟合}
 
 Stacking方法的失败是本研究最引人注目的发现之一。被设计为"SOTA"的XGB+XGB配置仅取得78.66\%的Macro-F1，为全部41组实验中的最低分之一。这一结果与集成学习文献中"Stacking通常优于单一模型"的常规结论形成鲜明反差，值得深入分析。
 
-Stacking失效的可能原因包括三个层面：
+Stacking失效的可能原因包括三个层面（详细诊断对比见图~\ref{fig:stacking-failure-analysis}）：
 
 \textbf{元特征空间维度不足}：如前所述，元特征维度仅为6维（3类 $\times$ 2视图）。在这么小维度的特征空间中，元学习器难以区分不同基模型预测模式的细微差异，导致模型容量受限。这与传统Stacking应用场景（如Kaggle竞赛中数十个基模型产生数百维元特征）形成鲜明对比。
 
 \textbf{内层CV数据划分不足}：Stacking依赖内层交叉验证构造OOF概率。在外层训练折仅含约120个样本的情况下，内层5折划分意味着每折仅约96个训练样本。基模型在如此小的训练集上估计的OOF概率噪声较大，传递给元学习器的信号质量有限。
 
 \textbf{元学习器超参数未充分调优}：当前Stacking实现中，元学习器直接使用默认超参数（如Logistic回归的$C=1.0$），未针对元特征空间的特殊性质进行专门优化。例如，考虑到元特征本质是概率，可能需要不同的正则化策略或特征变换。
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{../../outputs/figures/chapter8/fig3_stacking_failure_analysis.png}
+\caption{Stacking 失败分析诊断图。对比展示了所有 Stacking 变体与 Concat/MOFA/RNA-only 基线的 Macro-F1 表现。所有 Stacking 变体（蓝色）均低于简单融合基线（红色虚线），其中 XGB+XGB SOTA 配置表现最差（Macro-F1 $= 78.66\%$），RF+XGB Hybrid 相对最优（Macro-F1 $= 85.07\%$）但仍未达到基线水平。}
+\label{fig:stacking-failure-analysis}
+\end{figure}
 
 从教学角度看，Stacking的失败恰恰验证了课程的核心学习目标：方法选择必须结合数据特性与样本规模，而非盲目追求复杂度。这一"反直觉"发现为本研究增添了独特的实证价值。
 
@@ -81,5 +102,5 @@ Stacking失效的可能原因包括三个层面：
     \item \textbf{深度学习方法探索}：引入Transformer或Graph Neural Network等架构，探索端到端多组学融合在小样本条件下的可行性；
     \item \textbf{生物学机制阐释}：对Concat-SVM和MOFA的关键特征进行通路富集分析，建立特征-通路-亚型的文献映射，将统计发现转化为生物学洞察；
     \item \textbf{LumB分类难题攻关}：深入分析LumB易错样本的分子特征与临床表型，探索针对性改进策略（如引入拷贝数变异数据、采用层次分类策略）；
-    \item \textbf{自动化实验流水线}：基于当前配置文件驱动架构，开发全自动实验调度与报告生成系统，实现"配置 $\to$ 实验 $\to$ 图表 $\to$ 论文"的全流程自动化。
+    \item \textbf{自动化实验流水线}：基于当前配置文件驱动架构与已完成的自动化图表生成系统，进一步完善全自动实验调度与报告生成系统，实现“配置 $\to$ 实验 $\to$ 图表 $\to$ 论文”的全流程自动化闭环。
 \end{enumerate}

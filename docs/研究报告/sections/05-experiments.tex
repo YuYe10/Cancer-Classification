@@ -2,7 +2,7 @@
 
 \subsection{实验目标与科学问题}
 
-本节围绕两个核心科学问题展开实验设计：第一，在严格一致的评估口径下，不同多组学融合策略（RNA-only、Meth-only、Concat、MOFA、Stacking）的乳腺癌分子亚型分类性能是否存在显著差异；第二，性能变化趋势是否与融合机制的理论预期相一致，即更复杂的融合方法是否必然带来更优的分类效果。为回答这些问题，本研究构建了系统的实验矩阵，涵盖主线对比实验、敏感性分析实验和消融实验三大类，共计41组实验配置，确保结论建立在充分的实证基础之上。
+本节围绕两个核心科学问题展开实验设计：第一，在严格一致的评估口径下，不同多组学融合策略（RNA-only、Meth-only、Concat、MOFA、Stacking）的乳腺癌分子亚型分类性能是否存在显著差异；第二，性能变化趋势是否与融合机制的理论预期相一致，即更复杂的融合方法是否必然带来更优的分类效果。为回答这些问题，本研究构建了系统的实验矩阵，涵盖主线对比实验、敏感性分析实验和消融实验三大类，共计41组实验配置（实验全景矩阵见图~\ref{fig:experiment-matrix}），确保结论建立在充分的实证基础之上。
 
 \subsection{课程任务对照与完成度审计}
 
@@ -37,7 +37,25 @@
 
 \subsection{评估协议与统计方法}
 
-主结果统一使用重复分层交叉验证（repeated stratified cross-validation）作为评估协议，具体参数如下：
+\subsubsection{交叉验证协议设计}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\linewidth]{../../outputs/figures/chapter4/fig1_cv_protocol.png}
+\caption{重复分层交叉验证协议示意图。主实验采用 5 折 10 次重复（$n=50$ 测试折），分层策略确保每个折内各类别比例与总体分布一致。外层 Loop 控制数据划分，内层 Loop 在训练折内完成特征筛选与模型训练，测试折仅用于独立推断。}
+\label{fig:cv-protocol}
+\end{figure}
+
+\subsubsection{实验矩阵设计}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{../../outputs/figures/chapter4/fig2_experiment_matrix.png}
+\caption{实验矩阵全景图。涵盖主线对比实验、敏感性分析实验和消融实验三大类共 41 组实验配置。实验类别包括 RNA/Meth 单模态（2 组）、Concat 早期融合（5 组）、MOFA 潜在因子融合（4 组）、Stacking 晚期集成（9 组）和消融实验（5 组），另含 CV 参数敏感性及分类器对比等补充配置。}
+\label{fig:experiment-matrix}
+\end{figure}
+
+主结果统一使用重复分层交叉验证（repeated stratified cross-validation）作为评估协议，其协议设计如图~\ref{fig:cv-protocol} 所示，具体参数如下：
 
 \begin{itemize}
     \item 外层折数（folds）：5

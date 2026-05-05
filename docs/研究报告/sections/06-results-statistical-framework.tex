@@ -65,7 +65,7 @@ Stacking & 0.8556 & [0.826, 0.886] & 0.8479 & [0.816, 0.880] & 0.8479 & [0.815, 
     \item Stacking (XGB+Logistic)：堆叠集成主实验，$n=50$
 \end{itemize}
 
-从均值排序为：Concat(SVM) > MOFA > Concat(XGB) $\approx$ RNA-only > Meth-only > Stacking。Concat-SVM 在三项核心指标上均表现最优（Accuracy=90.64\%，Macro-F1=90.03\%），而 Stacking 方法反而表现最弱（Accuracy=85.56\%），提示在当前样本规模下增加融合层级并未带来稳定增益。
+从均值排序为：Concat-SVM > MOFA > Concat-XGB $\approx$ RNA-only > Meth-only > Stacking。Concat-SVM 在三项核心指标上均表现最优（Accuracy=90.64\%，Macro-F1=90.03\%），而 Stacking 方法反而表现最弱（Accuracy=85.56\%），提示在当前样本规模下增加融合层级并未带来稳定增益。
 
 \subsection{多指标置换检验}
 
@@ -77,7 +77,7 @@ Stacking & 0.8556 & [0.826, 0.886] & 0.8479 & [0.816, 0.880] & 0.8479 & [0.815, 
 \toprule
 方法对比 & |$\Delta$Accuracy| & |$\Delta$BalancedAcc| & |$\Delta$MacroF1| \\
 \midrule
-RNA vs Concat(SVM) & 0.0086 & 0.0212 & 0.0104 \\
+RNA vs Concat-SVM & 0.0086 & 0.0212 & 0.0104 \\
 RNA vs MOFA & 0.0022 & 0.0097 & 0.0004 \\
 RNA vs Meth & 0.0611 & 0.0534 & 0.0655 \\
 Concat vs MOFA & 0.0064 & 0.0115 & 0.0100 \\

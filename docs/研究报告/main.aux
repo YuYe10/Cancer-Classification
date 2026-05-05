@@ -22,132 +22,154 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.3}单一组学数据的表型解释局限性}{8}{subsection.1.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.4}多组学融合方法的发展轨迹与应用潜力}{9}{subsection.1.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.5}本研究的科学设计与核心问题}{10}{subsection.1.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces 本研究的技术路线图，涵盖数据加载、预处理、特征选择、模型训练与评估五个核心环节。\relax }}{11}{figure.caption.2}\protected@file@percent }
-\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:workflow}{{1}{11}{本研究的技术路线图，涵盖数据加载、预处理、特征选择、模型训练与评估五个核心环节。\relax }{figure.caption.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}相关工作}{11}{section.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}TCGA 驱动的癌症分型研究}{11}{subsection.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}多组学融合的经典路线}{12}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}多组学融合的经典路线}{11}{subsection.2.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}MOFA 与潜在因子学习}{12}{subsection.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}图神经网络与更广义的 AI 方法}{12}{subsection.2.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}本文的位置}{13}{subsection.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}数据来源与预处理}{13}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}TCGA 与 UCSC Xena 数据资源}{13}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}本文的位置}{12}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}数据来源与预处理}{12}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}TCGA 与 UCSC Xena 数据资源}{12}{subsection.3.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}RNA-seq 数据特点}{13}{subsection.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}DNA 甲基化数据特点}{14}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}DNA 甲基化数据特点}{13}{subsection.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces 高方差筛选前后 RNA 和甲基化特征分布对比。左侧为原始特征分布，右侧为筛选后前 $K$ 个高方差特征的分布形态。高方差特征筛选通过保留样本间波动最大的特征，有效去除噪声维度。\relax }}{14}{figure.caption.2}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:feature-distribution}{{1}{14}{高方差筛选前后 RNA 和甲基化特征分布对比。左侧为原始特征分布，右侧为筛选后前 $K$ 个高方差特征的分布形态。高方差特征筛选通过保留样本间波动最大的特征，有效去除噪声维度。\relax }{figure.caption.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4}临床标签与样本对齐}{14}{subsection.3.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}训练-测试划分与防泄露原则}{14}{subsection.3.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}标签映射}{14}{subsection.3.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7}样本分布统计}{15}{subsection.3.7}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces 对齐后样本分布统计\relax }}{15}{table.caption.3}\protected@file@percent }
-\newlabel{tab:sample-distribution}{{1}{15}{对齐后样本分布统计\relax }{table.caption.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces 对齐后样本的 PAM50 亚型分布。\relax }}{16}{figure.caption.4}\protected@file@percent }
-\newlabel{fig:sample-pie}{{2}{16}{对齐后样本的 PAM50 亚型分布。\relax }{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}方法}{16}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}符号说明与数学约定}{16}{subsection.4.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces 公式符号与变量定义\relax }}{17}{table.caption.5}\protected@file@percent }
-\newlabel{tab:symbols}{{2}{17}{公式符号与变量定义\relax }{table.caption.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}总体流程}{18}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}数据预处理与特征工程}{18}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}RNA-seq 对数变换与标准化}{18}{subsubsection.4.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.2}高方差特征筛选}{19}{subsubsection.4.3.2}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces RNA-seq特征选择算法\relax }}{19}{algorithm.1}\protected@file@percent }
-\newlabel{alg:feature-selection}{{1}{19}{RNA-seq特征选择算法\relax }{algorithm.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}四种融合方法定义}{20}{subsection.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.1}RNA-only 单模态基线}{20}{subsubsection.4.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.2}Concat 早期融合}{20}{subsubsection.4.4.2}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Concat早期融合算法\relax }}{20}{algorithm.2}\protected@file@percent }
-\newlabel{alg:concat}{{2}{20}{Concat早期融合算法\relax }{algorithm.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.3}MOFA 潜在因子融合}{20}{subsubsection.4.4.3}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces MOFA潜在因子融合算法\relax }}{21}{algorithm.3}\protected@file@percent }
-\newlabel{alg:mofa}{{3}{21}{MOFA潜在因子融合算法\relax }{algorithm.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.4}Stacking 晚期集成融合}{21}{subsubsection.4.4.4}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Stacking晚期集成融合算法\relax }}{22}{algorithm.4}\protected@file@percent }
-\newlabel{alg:stacking}{{4}{22}{Stacking晚期集成融合算法\relax }{algorithm.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}SVM 分类器与优化目标}{22}{subsection.4.5}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces SVM分类器训练算法\relax }}{23}{algorithm.5}\protected@file@percent }
-\newlabel{alg:svm}{{5}{23}{SVM分类器训练算法\relax }{algorithm.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}分类评价指标}{23}{subsection.4.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.7}偏倚控制与可复现性}{23}{subsection.4.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.8}本研究的创新点定位}{24}{subsection.4.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}实验设置}{24}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}实验目标与科学问题}{24}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}课程任务对照与完成度审计}{24}{subsection.5.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces 课程任务要求与当前完成度审计\relax }}{25}{table.caption.6}\protected@file@percent }
-\newlabel{tab:course-audit}{{3}{25}{课程任务要求与当前完成度审计\relax }{table.caption.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}数据来源与任务定义}{25}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}评估协议与统计方法}{25}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}分类器选择与统一性考量}{26}{subsection.5.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}实验入口与运行方式}{26}{subsection.5.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}结果解释原则与局限性声明}{26}{subsection.5.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}结果统计框架}{27}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}评估原则}{27}{subsection.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}统计量定义}{27}{subsection.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}比较原则}{27}{subsection.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}显著性检验说明}{27}{subsection.6.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}多指标统计结果}{28}{subsection.6.5}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces 六种融合策略性能对比（主线实验，$n=50$）\relax }}{28}{table.caption.7}\protected@file@percent }
-\newlabel{tab:results-main}{{4}{28}{六种融合策略性能对比（主线实验，$n=50$）\relax }{table.caption.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}多指标置换检验}{29}{subsection.6.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces 主要方法两两对比（均值差）\relax }}{29}{table.caption.8}\protected@file@percent }
-\newlabel{tab:permtest-all}{{5}{29}{主要方法两两对比（均值差）\relax }{table.caption.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}理论分析}{29}{subsection.6.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}结果与可视化分析}{29}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}主实验结果汇总（严格 CV）}{29}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}性能差异解释}{30}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}可视化证据}{30}{subsection.7.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces 六种融合策略 Accuracy 均值与 95\% CI 对比图。\relax }}{31}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:accuracy_ci_mainline}{{3}{31}{六种融合策略 Accuracy 均值与 95\% CI 对比图。\relax }{figure.caption.9}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces 六种方法 fold-level Accuracy 分布（箱线图）。\relax }}{32}{figure.caption.10}\protected@file@percent }
-\newlabel{fig:accuracy_distribution_mainline}{{4}{32}{六种方法 fold-level Accuracy 分布（箱线图）。\relax }{figure.caption.10}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Concat 融合策略在不同特征维度下的 Macro-F1 变化曲线。\relax }}{33}{figure.caption.11}\protected@file@percent }
-\newlabel{fig:dim_sensitivity}{{5}{33}{Concat 融合策略在不同特征维度下的 Macro-F1 变化曲线。\relax }{figure.caption.11}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces MOFA 融合策略在不同因子数下的 Macro-F1 变化曲线。\relax }}{34}{figure.caption.12}\protected@file@percent }
-\newlabel{fig:factors_sensitivity}{{6}{34}{MOFA 融合策略在不同因子数下的 Macro-F1 变化曲线。\relax }{figure.caption.12}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Stacking 不同变体的 Macro-F1 性能对比热力图。\relax }}{35}{figure.caption.13}\protected@file@percent }
-\newlabel{fig:stacking_heatmap}{{7}{35}{Stacking 不同变体的 Macro-F1 性能对比热力图。\relax }{figure.caption.13}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces 消融实验各组件贡献度分析。\relax }}{36}{figure.caption.14}\protected@file@percent }
-\newlabel{fig:ablation_comparison}{{8}{36}{消融实验各组件贡献度分析。\relax }{figure.caption.14}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}类别级误差分析}{36}{subsection.7.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Concat-SVM 方法的类别级性能（基于 CV 结果估算）\relax }}{36}{table.caption.15}\protected@file@percent }
-\newlabel{tab:class-performance}{{6}{36}{Concat-SVM 方法的类别级性能（基于 CV 结果估算）\relax }{table.caption.15}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}关键数值发现汇总}{37}{subsection.7.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.1}特征维度敏感性}{37}{subsubsection.7.5.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Concat 特征维度敏感性实验结果\relax }}{37}{table.caption.16}\protected@file@percent }
-\newlabel{tab:dim-sensitivity}{{7}{37}{Concat 特征维度敏感性实验结果\relax }{table.caption.16}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.2}CV 参数敏感性}{37}{subsubsection.7.5.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces CV 参数敏感性实验结果\relax }}{37}{table.caption.17}\protected@file@percent }
-\newlabel{tab:cv-sensitivity}{{8}{37}{CV 参数敏感性实验结果\relax }{table.caption.17}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.3}MOFA 因子数敏感性}{38}{subsubsection.7.5.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces MOFA 因子数敏感性实验结果\relax }}{38}{table.caption.18}\protected@file@percent }
-\newlabel{tab:mofa-sensitivity}{{9}{38}{MOFA 因子数敏感性实验结果\relax }{table.caption.18}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.4}Stacking 变体全面对比}{38}{subsubsection.7.5.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Stacking 变体性能全面对比 ($n$=25)\relax }}{38}{table.caption.19}\protected@file@percent }
-\newlabel{tab:stacking-all}{{10}{38}{Stacking 变体性能全面对比 ($n$=25)\relax }{table.caption.19}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}小结}{38}{subsection.7.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}讨论}{39}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}方法差异的深层解释与理论视角}{39}{subsection.8.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}失败案例深度分析：Stacking的系统性欠拟合}{39}{subsection.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}类别级误差分析与生物学启示}{40}{subsection.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}结果的可信度与统计功效考量}{40}{subsection.8.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}与现有文献的对比与定位}{41}{subsection.8.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.6}当前局限性与改进方向}{41}{subsection.8.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.7}未来工作展望}{42}{subsection.8.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}结论}{42}{section.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}主要贡献}{43}{subsection.9.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}理论价值与实践意义}{44}{subsection.9.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}创新性边界声明}{44}{subsection.9.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces RNA-seq、DNA 甲基化与临床标签三方样本对齐结果。对齐采用样本交集策略，以 RNA 列顺序为基准，确保多组学矩阵在同一索引上建模，避免因对齐错位导致的信息混淆。\relax }}{15}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:sample-alignment}{{2}{15}{RNA-seq、DNA 甲基化与临床标签三方样本对齐结果。对齐采用样本交集策略，以 RNA 列顺序为基准，确保多组学矩阵在同一索引上建模，避免因对齐错位导致的信息混淆。\relax }{figure.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}训练-测试划分与防泄露原则}{15}{subsection.3.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces 数据预处理管道流程。涵盖 RNA-seq 对数变换与甲基化缺失值处理、均值过滤、方差排序及标准化等关键步骤。预处理顺序严格遵循防泄露原则，所有参数估计均在训练折内完成。\relax }}{16}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:preprocessing-pipeline}{{3}{16}{数据预处理管道流程。涵盖 RNA-seq 对数变换与甲基化缺失值处理、均值过滤、方差排序及标准化等关键步骤。预处理顺序严格遵循防泄露原则，所有参数估计均在训练折内完成。\relax }{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6}标签映射}{16}{subsection.3.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7}样本分布统计}{17}{subsection.3.7}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces 对齐后样本分布统计\relax }}{17}{table.caption.5}\protected@file@percent }
+\newlabel{tab:sample-distribution}{{1}{17}{对齐后样本分布统计\relax }{table.caption.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces 对齐后样本的 PAM50 亚型分布。数据来源：TCGA-BRCA PAM50 临床标签，对齐后共 150 例有效样本（LumA/LumB/Basal 三类）。\relax }}{17}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:sample-pie}{{4}{17}{对齐后样本的 PAM50 亚型分布。数据来源：TCGA-BRCA PAM50 临床标签，对齐后共 150 例有效样本（LumA/LumB/Basal 三类）。\relax }{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}方法}{17}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}符号说明与数学约定}{17}{subsection.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces 公式符号与变量定义\relax }}{18}{table.caption.7}\protected@file@percent }
+\newlabel{tab:symbols}{{2}{18}{公式符号与变量定义\relax }{table.caption.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}总体流程}{19}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}数据预处理与特征工程}{19}{subsection.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.1}RNA-seq 对数变换与标准化}{19}{subsubsection.4.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.3.2}高方差特征筛选}{20}{subsubsection.4.3.2}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces RNA-seq特征选择算法\relax }}{20}{algorithm.1}\protected@file@percent }
+\newlabel{alg:feature-selection}{{1}{20}{RNA-seq特征选择算法\relax }{algorithm.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}四种融合方法定义}{21}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.1}融合方法架构对比}{21}{subsubsection.4.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces 四种融合策略（RNA-only、Concat、MOFA、Stacking）的架构对比。自上而下展示各方法的输入模态、融合机制与分类器结构。RNA-only 仅使用转录组数据作为单模态基线；Concat 将 RNA 与甲基化特征直接拼接；MOFA 通过潜在因子压缩冗余；Stacking 在分支级决策基础上进行元融合。\relax }}{21}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:fusion-methods-comparison}{{5}{21}{四种融合策略（RNA-only、Concat、MOFA、Stacking）的架构对比。自上而下展示各方法的输入模态、融合机制与分类器结构。RNA-only 仅使用转录组数据作为单模态基线；Concat 将 RNA 与甲基化特征直接拼接；MOFA 通过潜在因子压缩冗余；Stacking 在分支级决策基础上进行元融合。\relax }{figure.caption.8}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.2}方法管道总览}{22}{subsubsection.4.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces 融合方法实验管道总览。展示从数据读取、样本对齐、训练-测试划分到各融合分支训练的完整流程。所有可学习步骤（特征筛选、标准化、MOFA 拟合、Stacking 元特征构造）均限定在训练折内完成，测试折仅用于独立推断，严格遵循防泄露原则。\relax }}{22}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:method-pipeline-overview}{{6}{22}{融合方法实验管道总览。展示从数据读取、样本对齐、训练-测试划分到各融合分支训练的完整流程。所有可学习步骤（特征筛选、标准化、MOFA 拟合、Stacking 元特征构造）均限定在训练折内完成，测试折仅用于独立推断，严格遵循防泄露原则。\relax }{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.3}RNA-only 单模态基线}{22}{subsubsection.4.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.4}Concat 早期融合}{22}{subsubsection.4.4.4}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Concat早期融合算法\relax }}{23}{algorithm.2}\protected@file@percent }
+\newlabel{alg:concat}{{2}{23}{Concat早期融合算法\relax }{algorithm.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.5}MOFA 潜在因子融合}{23}{subsubsection.4.4.5}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces MOFA潜在因子融合算法\relax }}{24}{algorithm.3}\protected@file@percent }
+\newlabel{alg:mofa}{{3}{24}{MOFA潜在因子融合算法\relax }{algorithm.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.6}Stacking 晚期集成融合}{24}{subsubsection.4.4.6}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Stacking晚期集成融合算法\relax }}{25}{algorithm.4}\protected@file@percent }
+\newlabel{alg:stacking}{{4}{25}{Stacking晚期集成融合算法\relax }{algorithm.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}SVM 分类器与优化目标}{25}{subsection.4.5}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces SVM分类器训练算法\relax }}{26}{algorithm.5}\protected@file@percent }
+\newlabel{alg:svm}{{5}{26}{SVM分类器训练算法\relax }{algorithm.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}分类评价指标}{26}{subsection.4.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7}偏倚控制与可复现性}{26}{subsection.4.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.8}本研究的创新点定位}{27}{subsection.4.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}实验设置}{27}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}实验目标与科学问题}{27}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}课程任务对照与完成度审计}{27}{subsection.5.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces 课程任务要求与当前完成度审计\relax }}{28}{table.caption.10}\protected@file@percent }
+\newlabel{tab:course-audit}{{3}{28}{课程任务要求与当前完成度审计\relax }{table.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}数据来源与任务定义}{28}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}评估协议与统计方法}{29}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}交叉验证协议设计}{29}{subsubsection.5.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces 重复分层交叉验证协议示意图。主实验采用 5 折 10 次重复（$n=50$ 测试折），分层策略确保每个折内各类别比例与总体分布一致。外层 Loop 控制数据划分，内层 Loop 在训练折内完成特征筛选与模型训练，测试折仅用于独立推断。\relax }}{29}{figure.caption.11}\protected@file@percent }
+\newlabel{fig:cv-protocol}{{7}{29}{重复分层交叉验证协议示意图。主实验采用 5 折 10 次重复（$n=50$ 测试折），分层策略确保每个折内各类别比例与总体分布一致。外层 Loop 控制数据划分，内层 Loop 在训练折内完成特征筛选与模型训练，测试折仅用于独立推断。\relax }{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}实验矩阵设计}{30}{subsubsection.5.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces 实验矩阵全景图。涵盖主线对比实验、敏感性分析实验和消融实验三大类共 41 组实验配置。实验类别包括 RNA/Meth 单模态（2 组）、Concat 早期融合（5 组）、MOFA 潜在因子融合（4 组）、Stacking 晚期集成（9 组）和消融实验（5 组），另含 CV 参数敏感性及分类器对比等补充配置。\relax }}{30}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:experiment-matrix}{{8}{30}{实验矩阵全景图。涵盖主线对比实验、敏感性分析实验和消融实验三大类共 41 组实验配置。实验类别包括 RNA/Meth 单模态（2 组）、Concat 早期融合（5 组）、MOFA 潜在因子融合（4 组）、Stacking 晚期集成（9 组）和消融实验（5 组），另含 CV 参数敏感性及分类器对比等补充配置。\relax }{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}分类器选择与统一性考量}{31}{subsection.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}实验入口与运行方式}{31}{subsection.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}结果解释原则与局限性声明}{31}{subsection.5.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}结果统计框架}{31}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}评估原则}{31}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}统计量定义}{31}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}比较原则}{32}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}显著性检验说明}{32}{subsection.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}多指标统计结果}{32}{subsection.6.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces 六种融合策略性能对比（主线实验，$n=50$）\relax }}{32}{table.caption.13}\protected@file@percent }
+\newlabel{tab:results-main}{{4}{32}{六种融合策略性能对比（主线实验，$n=50$）\relax }{table.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}多指标置换检验}{33}{subsection.6.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces 主要方法两两对比（均值差）\relax }}{33}{table.caption.14}\protected@file@percent }
+\newlabel{tab:permtest-all}{{5}{33}{主要方法两两对比（均值差）\relax }{table.caption.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}理论分析}{33}{subsection.6.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}结果与可视化分析}{34}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}主实验结果汇总（严格 CV）}{34}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}性能差异解释}{34}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}可视化证据}{35}{subsection.7.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces 六种融合策略 Accuracy 均值与 95\% 置信区间对比。数据来源：主线实验 repeated stratified CV（5 folds $\times $ 10 repeats，$n=50$ 测试折）。Concat-SVM 取得最高均值（90.64\%），Stacking 最低（85.56\%）。\relax }}{35}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:accuracy_ci_mainline}{{9}{35}{六种融合策略 Accuracy 均值与 95\% 置信区间对比。数据来源：主线实验 repeated stratified CV（5 folds $\times $ 10 repeats，$n=50$ 测试折）。Concat-SVM 取得最高均值（90.64\%），Stacking 最低（85.56\%）。\relax }{figure.caption.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces 六种方法 fold-level Accuracy 分布箱线图（含抖动散点）。数据来源：各实验 JSON 日志中的 50 个测试折 fold-level Accuracy 值。Concat-SVM 与 MOFA 的中位线均高于其他方法，Stacking 分布离散度最大。\relax }}{36}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:accuracy_distribution_mainline}{{10}{36}{六种方法 fold-level Accuracy 分布箱线图（含抖动散点）。数据来源：各实验 JSON 日志中的 50 个测试折 fold-level Accuracy 值。Concat-SVM 与 MOFA 的中位线均高于其他方法，Stacking 分布离散度最大。\relax }{figure.caption.16}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Concat 融合特征维度敏感性分析。数据来源：Concat 维度敏感性实验（5 folds $\times $ 3 repeats，$n=15$ 测试折）。维度从 100 增至 500 时 Macro-F1 持续提升，500 维后趋于饱和（$\approx 0.90$），dim100 时因信息损失严重出现明显欠拟合。\relax }}{36}{figure.caption.17}\protected@file@percent }
+\newlabel{fig:dim_sensitivity}{{11}{36}{Concat 融合特征维度敏感性分析。数据来源：Concat 维度敏感性实验（5 folds $\times $ 3 repeats，$n=15$ 测试折）。维度从 100 增至 500 时 Macro-F1 持续提升，500 维后趋于饱和（$\approx 0.90$），dim100 时因信息损失严重出现明显欠拟合。\relax }{figure.caption.17}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces MOFA 潜在因子数敏感性分析。数据来源：MOFA 因子数敏感性实验（5 folds $\times $ 3 repeats，$n=15$ 测试折）。因子数 15--20 区间性能最优（Macro-F1 $\approx 0.896$），因子数增至 25 时出现性能下降（Macro-F1 降至 86.80\%），提示过多因子引入噪声或过拟合风险。\relax }}{37}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:factors_sensitivity}{{12}{37}{MOFA 潜在因子数敏感性分析。数据来源：MOFA 因子数敏感性实验（5 folds $\times $ 3 repeats，$n=15$ 测试折）。因子数 15--20 区间性能最优（Macro-F1 $\approx 0.896$），因子数增至 25 时出现性能下降（Macro-F1 降至 86.80\%），提示过多因子引入噪声或过拟合风险。\relax }{figure.caption.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Stacking 变体性能对比热力图。数据来源：Stacking 变体实验（5 folds $\times $ 5 repeats，$n=25$ 测试折）。行为基模型配置（XGB/RF/SVM），列为元模型配置。被设计为“SOTA”的 XGB+XGB 组合仅获 Macro-F1 $= 78.66\%$，为全部 Stacking 变体中最低；RF+XGB Hybrid 取得组内最优（Macro-F1 $= 85.07\%$）。\relax }}{37}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:stacking_heatmap}{{13}{37}{Stacking 变体性能对比热力图。数据来源：Stacking 变体实验（5 folds $\times $ 5 repeats，$n=25$ 测试折）。行为基模型配置（XGB/RF/SVM），列为元模型配置。被设计为“SOTA”的 XGB+XGB 组合仅获 Macro-F1 $= 78.66\%$，为全部 Stacking 变体中最低；RF+XGB Hybrid 取得组内最优（Macro-F1 $= 85.07\%$）。\relax }{figure.caption.19}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces 消融实验各组件贡献度分析。数据来源：消融实验（5 folds $\times $ 5 repeats，$n=25$ 测试折）。横轴为消融条件（Full / no\_FS / no\_Meth / no\_RNA / balanced），纵轴为 Macro-F1。去除甲基化（no\_Meth）导致性能下降最大（$-$8.8\%），去除特征筛选（no\_FS）影响最小（$-$2.7\%），验证了甲基化信息对跨组学互补的不可替代贡献。\relax }}{38}{figure.caption.20}\protected@file@percent }
+\newlabel{fig:ablation_comparison}{{14}{38}{消融实验各组件贡献度分析。数据来源：消融实验（5 folds $\times $ 5 repeats，$n=25$ 测试折）。横轴为消融条件（Full / no\_FS / no\_Meth / no\_RNA / balanced），纵轴为 Macro-F1。去除甲基化（no\_Meth）导致性能下降最大（$-$8.8\%），去除特征筛选（no\_FS）影响最小（$-$2.7\%），验证了甲基化信息对跨组学互补的不可替代贡献。\relax }{figure.caption.20}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}类别级误差分析}{38}{subsection.7.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Concat-SVM 方法的类别级性能（基于 CV 结果估算）\relax }}{38}{table.caption.21}\protected@file@percent }
+\newlabel{tab:class-performance}{{6}{38}{Concat-SVM 方法的类别级性能（基于 CV 结果估算）\relax }{table.caption.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}关键数值发现汇总}{38}{subsection.7.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.1}特征维度敏感性}{38}{subsubsection.7.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Concat 特征维度敏感性实验结果\relax }}{39}{table.caption.22}\protected@file@percent }
+\newlabel{tab:dim-sensitivity}{{7}{39}{Concat 特征维度敏感性实验结果\relax }{table.caption.22}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.2}CV 参数敏感性}{39}{subsubsection.7.5.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces CV 参数敏感性实验结果\relax }}{39}{table.caption.23}\protected@file@percent }
+\newlabel{tab:cv-sensitivity}{{8}{39}{CV 参数敏感性实验结果\relax }{table.caption.23}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.3}MOFA 因子数敏感性}{40}{subsubsection.7.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces MOFA 因子数敏感性实验结果\relax }}{40}{table.caption.24}\protected@file@percent }
+\newlabel{tab:mofa-sensitivity}{{9}{40}{MOFA 因子数敏感性实验结果\relax }{table.caption.24}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.5.4}Stacking 变体全面对比}{40}{subsubsection.7.5.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Stacking 变体性能全面对比 ($n$=25)\relax }}{40}{table.caption.25}\protected@file@percent }
+\newlabel{tab:stacking-all}{{10}{40}{Stacking 变体性能全面对比 ($n$=25)\relax }{table.caption.25}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}小结}{40}{subsection.7.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}讨论}{41}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}方法差异的深层解释与理论视角}{41}{subsection.8.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces 偏差-方差权衡分析。在小样本高维场景（$n \approx 150$，$p \gg n$）下，复杂模型（Stacking）虽然偏差较低，但方差显著增大，导致总体泛化误差上升；简单模型（Concat-SVM）通过限制模型复杂度，实现了更优的偏差-方差权衡。\relax }}{41}{figure.caption.26}\protected@file@percent }
+\newlabel{fig:bias-variance-tradeoff}{{15}{41}{偏差-方差权衡分析。在小样本高维场景（$n \approx 150$，$p \gg n$）下，复杂模型（Stacking）虽然偏差较低，但方差显著增大，导致总体泛化误差上升；简单模型（Concat-SVM）通过限制模型复杂度，实现了更优的偏差-方差权衡。\relax }{figure.caption.26}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces 模型复杂度与分类性能关系分析。横轴为模型复杂度的递增顺序（RNA-only $\to $ Concat $\to $ MOFA $\to $ Stacking），纵轴为 Macro-F1 分数。Concat-SVM 位于性能最优区，Stacking 反而出现性能下降，呈现倒 U 型曲线，验证了“适度复杂度最优”的偏差-方差权衡规律。\relax }}{42}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:complexity-vs-performance}{{16}{42}{模型复杂度与分类性能关系分析。横轴为模型复杂度的递增顺序（RNA-only $\to $ Concat $\to $ MOFA $\to $ Stacking），纵轴为 Macro-F1 分数。Concat-SVM 位于性能最优区，Stacking 反而出现性能下降，呈现倒 U 型曲线，验证了“适度复杂度最优”的偏差-方差权衡规律。\relax }{figure.caption.27}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}失败案例深度分析：Stacking的系统性欠拟合}{42}{subsection.8.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Stacking 失败分析诊断图。对比展示了所有 Stacking 变体与 Concat/MOFA/RNA-only 基线的 Macro-F1 表现。所有 Stacking 变体（蓝色）均低于简单融合基线（红色虚线），其中 XGB+XGB SOTA 配置表现最差（Macro-F1 $= 78.66\%$），RF+XGB Hybrid 相对最优（Macro-F1 $= 85.07\%$）但仍未达到基线水平。\relax }}{43}{figure.caption.28}\protected@file@percent }
+\newlabel{fig:stacking-failure-analysis}{{17}{43}{Stacking 失败分析诊断图。对比展示了所有 Stacking 变体与 Concat/MOFA/RNA-only 基线的 Macro-F1 表现。所有 Stacking 变体（蓝色）均低于简单融合基线（红色虚线），其中 XGB+XGB SOTA 配置表现最差（Macro-F1 $= 78.66\%$），RF+XGB Hybrid 相对最优（Macro-F1 $= 85.07\%$）但仍未达到基线水平。\relax }{figure.caption.28}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}类别级误差分析与生物学启示}{44}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}结果的可信度与统计功效考量}{44}{subsection.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}与现有文献的对比与定位}{44}{subsection.8.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.6}当前局限性与改进方向}{45}{subsection.8.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.7}未来工作展望}{45}{subsection.8.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}结论}{46}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}主要贡献}{47}{subsection.9.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}理论价值与实践意义}{47}{subsection.9.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}创新性边界声明}{48}{subsection.9.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}局限性声明}{48}{subsection.9.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}未来展望}{48}{subsection.9.5}\protected@file@percent }
 \bibcite{tcga2013}{1}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}局限性声明}{45}{subsection.9.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.5}未来展望}{45}{subsection.9.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {10}参考文献}{45}{section.10}\protected@file@percent }
 \bibcite{xena2017}{2}
 \bibcite{pam50}{3}
 \bibcite{mofa2016}{4}
 \bibcite{svm1995}{5}
 \bibcite{shap2017}{6}
+\@writefile{toc}{\contentsline {section}{\numberline {10}参考文献}{49}{section.10}\protected@file@percent }
 \bibcite{mogonet2021}{7}
 \bibcite{aebersold2018}{8}
 \bibcite{cawley2010}{9}
 \bibcite{hughes1968}{10}
-\gdef \@abspage@last{46}
+\gdef \@abspage@last{50}

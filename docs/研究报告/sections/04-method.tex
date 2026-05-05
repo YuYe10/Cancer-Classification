@@ -46,7 +46,7 @@ $\hat{P}^{oof}$ & Out-of-fold 概率预测 \\
 
 \subsection{总体流程}
 
-本文采用统一的配置驱动流程，对六种分类方法进行同口径比较：RNA-only、Meth-only、Concat、MOFA、Stacking 及其变体。实验流水线由同一入口模块调度，包含以下关键步骤：
+本文采用统一的配置驱动流程，对六种分类方法进行同口径比较：RNA-only、Meth-only、Concat、MOFA、Stacking 及其变体。方法的整体架构如图~\ref{fig:fusion-methods-comparison} 所示，实验管道总览见图~\ref{fig:method-pipeline-overview}。实验流水线由同一入口模块调度，包含以下关键步骤：
 
 \begin{enumerate}
     \item \textbf{数据读取与样本对齐}：从三个源文件（RNA表达矩阵、甲基化矩阵、临床标签）读取数据，通过样本标识符进行三方对齐，确保每个组学矩阵和标签对应同一批样本。
@@ -102,6 +102,24 @@ Z_{ij} = \frac{\tilde{X}_{ij} - \mu_j}{\sigma_j},
 \end{algorithm}
 
 \subsection{四种融合方法定义}
+
+\subsubsection{融合方法架构对比}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../../outputs/figures/chapter3/fig1_fusion_methods_comparison.png}
+\caption{四种融合策略（RNA-only、Concat、MOFA、Stacking）的架构对比。自上而下展示各方法的输入模态、融合机制与分类器结构。RNA-only 仅使用转录组数据作为单模态基线；Concat 将 RNA 与甲基化特征直接拼接；MOFA 通过潜在因子压缩冗余；Stacking 在分支级决策基础上进行元融合。}
+\label{fig:fusion-methods-comparison}
+\end{figure}
+
+\subsubsection{方法管道总览}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{../../outputs/figures/chapter3/fig2_method_pipeline_overview.png}
+\caption{融合方法实验管道总览。展示从数据读取、样本对齐、训练-测试划分到各融合分支训练的完整流程。所有可学习步骤（特征筛选、标准化、MOFA 拟合、Stacking 元特征构造）均限定在训练折内完成，测试折仅用于独立推断，严格遵循防泄露原则。}
+\label{fig:method-pipeline-overview}
+\end{figure}
 
 \subsubsection{RNA-only 单模态基线}
 
