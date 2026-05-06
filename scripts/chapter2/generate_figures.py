@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-第2章：数据分布与预处理 - 图表生成脚本（美化版）
-
-优化要点：
-1. 全局字号提升（标题16→18，正文11→13，标注9→11）
-2. 关键信息用高对比色块/粗体突出
-3. 精简冗余文字，保留核心信息
-4. 增大图表尺寸以容纳更大字号
+第2章：数据分布与预处理 - 图表生成脚本
 """
 
 import os
@@ -103,7 +97,7 @@ def generate_fig2_data_preprocessing_pipeline():
     ax.set_ylim(0, 11)
     ax.axis('off')
 
-    ax.text(8, 10.5, '多组学数据预处理流水线', ha='center', fontsize=20, fontweight='bold')
+    ax.text(5.5, 10.5, '多组学数据预处理流水线', ha='center', fontsize=20, fontweight='bold')
 
     def draw_box(x, y, w, h, text, color, fontsize=11):
         box = FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.05",
@@ -132,23 +126,50 @@ def generate_fig2_data_preprocessing_pipeline():
     draw_box(7, 2.5, 3.5, 1.2, '⑨ 数据集划分\n(CV-ready)', '#C6EFCE')
     draw_box(7, 0.5, 3.5, 1.2, '⑩ 输出验证', '#E2EFDA')
 
-    # 箭头
-    for y in [8.5, 6.5, 4.5, 2.5]:
-        draw_arrow(2.25, y, 2.25, y + 0.7)
-    for y in [8.5, 6.5, 4.5, 2.5]:
-        draw_arrow(8.75, y, 8.75, y + 0.7)
-    draw_arrow(4, 1.1, 7, 1.1)
+    # 箭头 - 从上一个框底部指向下一个框顶部（向下方向）
+    for y in [9.7, 7.7, 5.7, 3.7]:  # 使用每个框的顶部位置作为起点
+        draw_arrow(2.25, y - 1.2, 2.25, y - 2.0)
+    for y in [9.7, 7.7, 5.7, 3.7]:
+        draw_arrow(8.75, y - 1.2, 8.75, y - 2.0)
+    #draw_arrow(4, 1.1, 7, 1.1)
 
+    # 左列流程作用标注
+    ax.text(-0.8, 9.8, 'PROCESSING STEPS', ha='center', fontsize=15, fontweight='bold')
+    input_notes = [
+        (-1.3, 9.1, '加载多组学\n原始数据'),
+        (-1.3, 7.1, '匹配样本ID\n三模态整合'),
+        (-1.3, 5.1, '处理缺失值\n保证完整性'),
+        (-1.3, 3.1, '过滤低方差\n保留信息特征'),
+        (-1.3, 1.1, '特征降维\nTop-2000'),
+    ]
+    for x, y, text in input_notes:
+        ax.text(x, y, text, ha='left', va='center', fontsize=14, color='#555555',
+                bbox=dict(boxstyle='round,pad=0.25', facecolor='#E8F4F8', alpha=0.8))
+
+    ax.text(5.5, 9.8, 'DATA DIMENSIONS', ha='center', fontsize=15, fontweight='bold')
     # 精简维度标注
     dim_notes = [
-        (11.2, 9.1, '~20K genes\n~400K CpG'),
-        (11.2, 7.1, '~150 samples'),
-        (11.2, 5.1, 'No missing'),
-        (11.2, 3.1, 'High-variance'),
-        (11.2, 1.1, '2000 dims'),
+        (4.9, 9.1, '~20K genes\n~400K CpG'),
+        (4.9, 7.1, '~150 samples'),
+        (4.9, 5.1, 'No missing'),
+        (4.9, 3.1, 'High-variance'),
+        (4.9, 1.1, '2000 dims'),
     ]
     for x, y, text in dim_notes:
-        ax.text(x, y, text, ha='left', va='center', fontsize=10, color='#555555',
+        ax.text(x, y, text, ha='left', va='center', fontsize=14, color='#555555',
+                bbox=dict(boxstyle='round,pad=0.25', facecolor='#F8F8F8', alpha=0.8))
+
+    # 右列流程作用标注
+    ax.text(12, 9.8, 'PROCESSING STEPS', ha='center', fontsize=15, fontweight='bold')
+    process_notes = [
+        (11.0, 9.1, '标准化表达量\n消除量纲差异'),
+        (11.0, 7.1, '分类标签\nOne-hot编码'),
+        (11.0, 5.1, '平衡样本\n提高模型鲁棒性'),
+        (11.0, 3.1, '分层采样\n保持分布一致'),
+        (11.0, 1.1, 'QC验证\n数据质量保障'),
+    ]
+    for x, y, text in process_notes:
+        ax.text(x, y, text, ha='left', va='center', fontsize=14, color='#555555',
                 bbox=dict(boxstyle='round,pad=0.25', facecolor='#F8F8F8', alpha=0.8))
 
     plt.tight_layout()
@@ -222,7 +243,7 @@ def generate_fig3_feature_distribution():
     ax4.spines['top'].set_visible(False)
     ax4.spines['right'].set_visible(False)
 
-    plt.suptitle('多组学特征分布对比：标准化前后', fontsize=18, fontweight='bold', y=0.98)
+    plt.suptitle('多组学特征分布对比', fontsize=18, fontweight='bold', y=0.98)
     plt.tight_layout()
 
     output_path = OUTPUT_DIR / 'fig3_feature_distribution.png'
