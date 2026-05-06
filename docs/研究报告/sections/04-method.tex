@@ -46,7 +46,7 @@ $\hat{P}^{oof}$ & Out-of-fold 概率预测 \\
 
 \subsection{总体流程}
 
-本文采用统一的配置驱动流程，对六种分类方法进行同口径比较：RNA-only、Meth-only、Concat、MOFA、Stacking 及其变体。方法的整体架构如图~\ref{fig:fusion-methods-comparison} 所示，实验管道总览见图~\ref{fig:method-pipeline-overview}。实验流水线由同一入口模块调度，包含以下关键步骤：
+本文采用统一的配置驱动流程，对六种分类方法进行同口径比较：RNA-only、Meth-only、Concat、MOFA、Stacking 及其变体。四种核心融合策略的架构分别如图~\ref{fig:rna-only}、\ref{fig:concat}、\ref{fig:mofa}、\ref{fig:stacking} 所示，实验管道总览见图~\ref{fig:method-pipeline-overview}。实验流水线由同一入口模块调度，包含以下关键步骤：
 
 \begin{enumerate}
     \item \textbf{数据读取与样本对齐}：从三个源文件（RNA表达矩阵、甲基化矩阵、临床标签）读取数据，通过样本标识符进行三方对齐，确保每个组学矩阵和标签对应同一批样本。
@@ -105,11 +105,34 @@ Z_{ij} = \frac{\tilde{X}_{ij} - \mu_j}{\sigma_j},
 
 \subsubsection{融合方法架构对比}
 
+本文采用四种代表性的多组学融合策略进行系统性比较，每种方法代表不同的融合范式：
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\linewidth]{../../outputs/figures/chapter3/fig1_fusion_methods_comparison.png}
-\caption{四种融合策略（RNA-only、Concat、MOFA、Stacking）的架构对比。自上而下展示各方法的输入模态、融合机制与分类器结构。RNA-only 仅使用转录组数据作为单模态基线；Concat 将 RNA 与甲基化特征直接拼接；MOFA 通过潜在因子压缩冗余；Stacking 在分支级决策基础上进行元融合。}
-\label{fig:fusion-methods-comparison}
+\includegraphics[width=0.7\linewidth]{../../outputs/figures/chapter3/fig1a_rna_only.png}
+\caption{RNA-only 单模态基线架构。该方法仅使用 RNA-seq 表达数据作为输入，经过预处理后直接输入分类器进行亚型预测。作为单模态基线，其性能为后续融合方法的收益评估提供参照基准。}
+\label{fig:rna-only}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{../../outputs/figures/chapter3/fig1b_concat.png}
+\caption{Concat 早期融合架构。该方法将 RNA-seq 与甲基化特征在特征空间直接拼接（约4000维），形成联合特征表示后输入分类器。此方法不引入额外参数，是最简单的多模态融合基线。}
+\label{fig:concat}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{../../outputs/figures/chapter3/fig1c_mofa.png}
+\caption{MOFA 潜在因子融合架构。该方法通过多因子分析将高维组学数据压缩为15-20个潜在因子，捕捉跨模态共享信息。潜在因子矩阵随后输入分类器进行预测，实现基于因子分解的中期融合。}
+\label{fig:mofa}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\linewidth]{../../outputs/figures/chapter3/fig1d_stacking.png}
+\caption{Stacking 晚期集成架构。该方法首先在两个模态上分别训练基模型，获取 out-of-fold 预测概率作为元特征，再通过元学习器进行最终融合决策，实现决策级的晚期融合。}
+\label{fig:stacking}
 \end{figure}
 
 \subsubsection{方法管道总览}
