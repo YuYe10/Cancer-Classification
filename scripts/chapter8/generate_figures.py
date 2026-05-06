@@ -166,68 +166,118 @@ def generate_fig2_complexity_vs_performance():
 def generate_fig3_stacking_failure_analysis():
     print("\n生成图3: Stacking失败分析")
 
-    fig, ax = plt.subplots(figsize=(13, 9))
-    ax.set_xlim(0, 13)
-    ax.set_ylim(0, 9)
-    ax.axis('off')
+    fig = plt.figure(figsize=(16, 10))
+    gs = fig.add_gridspec(2, 2, height_ratios=[1, 1.2])
+    
+    ax1 = fig.add_subplot(gs[0, :])
+    ax2 = fig.add_subplot(gs[1, :])
+    
+    ax1.set_xlim(0, 16)
+    ax1.set_ylim(0, 5)
+    ax1.axis('off')
 
-    ax.text(6.5, 8.5, 'Stacking方法系统性欠拟合原因分析',
-            ha='center', fontsize=20, fontweight='bold')
+    ax1.text(8, 4.5, 'Stacking方法系统性欠拟合原因分析',
+             ha='center', fontsize=22, fontweight='bold')
 
     def draw_reason_box(x, y, title, content, impact_color):
-        box = mpatches.FancyBboxPatch((x, y), 3.5, 2.8,
+        box = mpatches.FancyBboxPatch((x, y), 4.8, 3,
                                        boxstyle="round,pad=0.3",
                                        facecolor='#F5F5F5',
                                        edgecolor=impact_color,
                                        linewidth=3,
                                        alpha=0.95)
-        ax.add_patch(box)
-        ax.text(x + 1.75, y + 2.5, title, ha='center', va='center',
-                fontsize=13, fontweight='bold', color=impact_color)
+        ax1.add_patch(box)
+        ax1.text(x + 2.4, y + 2.6, title, ha='center', va='center',
+                fontsize=14, fontweight='bold', color=impact_color)
         for i, line in enumerate(content):
-            ax.text(x + 0.2, y + 1.9 - i*0.5, f"• {line}",
-                    fontsize=11, va='top', fontweight='bold')
+            ax1.text(x + 0.3, y + 2 - i*0.55, f"• {line}",
+                    fontsize=12, va='top', fontweight='bold')
 
-    draw_reason_box(0.5, 4.5, '① 元特征维度不足',
+    draw_reason_box(0.5, 0.8, '① 元特征维度不足',
                    ['元特征仅6维 (3类×2视图)',
                     '远低于传统Stacking场景',
                     '元学习器容量受限',
                     '难以学习互补模式'],
                    '#D9730D')
 
-    draw_reason_box(4.8, 4.5, '② 内层CV数据不足',
+    draw_reason_box(5.8, 0.8, '② 内层CV数据不足',
                    ['外层训练折仅~120样本',
                     '内层5折→每折~96样本',
                     'OOF概率估计噪声大',
                     '信号质量有限'],
                    '#D4A017')
 
-    draw_reason_box(9.1, 4.5, '③ 超参数未优化',
+    draw_reason_box(11.1, 0.8, '③ 超参数未优化',
                    ['使用默认超参数',
                     'Logistic C=1.0 (未调优)',
                     '未针对概率特征优化',
                     '正则化策略不匹配'],
                    '#888888')
 
-    summary_box = mpatches.FancyBboxPatch((1, 0.4), 11, 3.2,
-                                          boxstyle="round,pad=0.4",
-                                          facecolor='#FFF8DC',
-                                          edgecolor='#333333',
-                                          linewidth=2.5,
-                                          alpha=0.95)
-    ax.add_patch(summary_box)
+    baseline_methods = [
+        ('RNA-only', 0.8978, '#2E5AAC'),
+        ('Meth-only', 0.8367, '#D9730D'),
+        ('Concat-SVM', 0.9064, '#4A9B4A'),
+        ('MOFA-20', 0.9000, '#D4A017'),
+    ]
+    stacking_methods = [
+        ('XGB+Logistic', 0.8479, '#888888'),
+        ('XGB+XGB-SOTA', 0.7866, '#C0392B'),
+        ('RF+XGB-Hyb', 0.8507, '#999999'),
+        ('SVM+XGB', 0.8061, '#AAAAAA'),
+        ('XGB+SVM', 0.8147, '#BBBBBB'),
+        ('XGB+LR-meta', 0.7745, '#C0392B'),
+    ]
 
-    summary_text = (
-        "实证结果验证:\n"
-        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-        "• XGB+XGB (设计为SOTA): Macro-F1=78.66% ← 全实验最低之一\n"
-        "• RF+XGB-Hybrid (非主流配置): Macro-F1=85.07% ← Stacking组最佳\n"
-        "• XGB+Logistic (标准配置): Macro-F1=84.79% ← 中等水平\n\n"
-        "结论: Stacking对base/meta选择极为敏感，不存在普适最优配置。\n"
-        "       在小样本(n≈150)场景下，增加融合层级反而引入过拟合风险。"
-    )
-    ax.text(6.5, 2.9, summary_text, ha='center', va='center',
-            fontsize=11, fontweight='bold')
+    x_baseline = np.arange(len(baseline_methods))
+    x_stacking = np.arange(len(baseline_methods), len(baseline_methods) + len(stacking_methods))
+    
+    baseline_colors = [m[2] for m in baseline_methods]
+    stacking_colors = [m[2] for m in stacking_methods]
+
+    bars_baseline = ax2.bar(x_baseline, [m[1] for m in baseline_methods], 
+                           width=0.6, color=baseline_colors, edgecolor='black', linewidth=2,
+                           label='基线方法')
+    bars_stacking = ax2.bar(x_stacking, [m[1] for m in stacking_methods], 
+                           width=0.6, color=stacking_colors, edgecolor='black', linewidth=2,
+                           label='Stacking变体')
+
+    ax2.axhline(y=0.8978, color='#2E5AAC', linestyle='--', linewidth=2.5, 
+               label='RNA-only 基线 (89.78%)')
+    ax2.axhline(y=0.9064, color='#4A9B4A', linestyle=':', linewidth=2.5, 
+               label='Concat-SVM SOTA (90.64%)')
+
+    ax2.set_xlabel('方法配置', fontsize=14, fontweight='bold')
+    ax2.set_ylabel('Macro-F1', fontsize=14, fontweight='bold')
+    ax2.set_title('Stacking变体 vs 基线方法性能对比',
+                  fontsize=16, fontweight='bold', pad=15)
+    ax2.set_xticks(np.arange(len(baseline_methods) + len(stacking_methods)))
+    ax2.set_xticklabels([m[0] for m in baseline_methods] + [m[0] for m in stacking_methods],
+                       rotation=45, ha='right', fontsize=11, fontweight='bold')
+    ax2.set_ylim(0.72, 0.94)
+    ax2.grid(True, linestyle='--', alpha=0.4)
+    ax2.legend(loc='upper right', fontsize=11)
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+
+    for bar in bars_baseline:
+        height = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2., height + 0.005,
+                f'{height:.4f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+    for bar in bars_stacking:
+        height = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2., height + 0.005,
+                f'{height:.4f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+    insight_text = ("关键发现:\n"
+                   "• 所有Stacking变体均低于RNA-only基线\n"
+                   "• XGB+XGB-SOTA表现最差 (78.66%)\n"
+                   "• RF+XGB-Hybrid为Stacking组最优 (85.07%)\n"
+                   "• Stacking组整体低于Concat/MOFA约5-12个百分点")
+    props = dict(boxstyle='round,pad=0.5', facecolor='#FFF8DC', edgecolor='#DAA520', linewidth=2, alpha=0.9)
+    ax2.text(0.02, 0.98, insight_text, transform=ax2.transAxes, fontsize=11,
+            verticalalignment='top', bbox=props, fontweight='bold')
 
     plt.tight_layout()
     output_path = OUTPUT_DIR / 'fig3_stacking_failure_analysis.png'
