@@ -177,7 +177,7 @@ def generate_fig3_feature_distribution():
     ax1 = axes[0, 0]
     ax1.hist(rna_raw, bins=50, color='#2E5AAC', alpha=0.75, edgecolor='white', linewidth=0.8)
     ax1.axvline(np.mean(rna_raw), color='#C0392B', linestyle='--', linewidth=2.5, label=f'Mean={np.mean(rna_raw):.2f}')
-    ax1.set_title('RNA-seq 表达值分布 (原始)', fontsize=15, fontweight='bold')
+    ax1.set_title('RNA-seq表达值分布', fontsize=15, fontweight='bold')
     ax1.set_xlabel('Expression Value (log2)', fontsize=13)
     ax1.set_ylabel('Frequency', fontsize=13)
     ax1.legend(fontsize=11)
@@ -189,7 +189,7 @@ def generate_fig3_feature_distribution():
     ax2 = axes[0, 1]
     ax2.hist(meth_raw, bins=50, color='#D9730D', alpha=0.75, edgecolor='white', linewidth=0.8, range=[0, 1])
     ax2.axvline(np.mean(meth_raw), color='#C0392B', linestyle='--', linewidth=2.5, label=f'Mean={np.mean(meth_raw):.3f}')
-    ax2.set_title('DNA甲基化 β值 分布 (原始)', fontsize=15, fontweight='bold')
+    ax2.set_title('DNA甲基化β值分布', fontsize=15, fontweight='bold')
     ax2.set_xlabel('Methylation Beta Value', fontsize=13)
     ax2.set_ylabel('Frequency', fontsize=13)
     ax2.legend(fontsize=11)
@@ -202,7 +202,7 @@ def generate_fig3_feature_distribution():
     ax3 = axes[1, 0]
     ax3.hist(rna_norm, bins=50, color='#2E5AAC', alpha=0.75, edgecolor='white', linewidth=0.8)
     ax3.axvline(0, color='#C0392B', linestyle='--', linewidth=2.5, label='Mean=0')
-    ax3.set_title('RNA-seq 分布 (Z-score标准化后)', fontsize=15, fontweight='bold')
+    ax3.set_title('RNA-seq表达值分布(Z-score标准化后)', fontsize=15, fontweight='bold')
     ax3.set_xlabel('Z-score', fontsize=13)
     ax3.set_ylabel('Frequency', fontsize=13)
     ax3.legend(fontsize=11)
@@ -214,7 +214,7 @@ def generate_fig3_feature_distribution():
     ax4 = axes[1, 1]
     ax4.hist(meth_norm, bins=50, color='#D9730D', alpha=0.75, edgecolor='white', linewidth=0.8)
     ax4.axvline(0, color='#C0392B', linestyle='--', linewidth=2.5, label='Mean=0')
-    ax4.set_title('Methylation 分布 (Z-score标准化后)', fontsize=15, fontweight='bold')
+    ax4.set_title('DNA甲基化β值分布(Z-score标准化后)', fontsize=15, fontweight='bold')
     ax4.set_xlabel('Z-score', fontsize=13)
     ax4.set_ylabel('Frequency', fontsize=13)
     ax4.legend(fontsize=11)
@@ -249,35 +249,36 @@ def generate_fig4_sample_alignment():
         ellipse = mpatches.Ellipse((x, y), w, h, facecolor=color, edgecolor='black', linewidth=2.5, alpha=0.7)
         ax.add_patch(ellipse)
         ax.text(x, y, f'{label}\n(n={n_samples})', ha='center', va='center',
-                fontsize=13, fontweight='bold')
+                fontsize=15, fontweight='bold')
 
     draw_ellipse(2.5, 6, 3, 2.2, 'RNA-seq', '~1100', '#2E5AAC')
     draw_ellipse(6.5, 6, 3, 2.2, 'Methylation', '~900', '#D9730D')
     draw_ellipse(10.5, 6, 3, 2.2, 'PAM50', '~1000', '#4A9B4A')
 
-    ax.annotate('', xy=(6.5, 4.2), xytext=(2.5, 5.0), arrowprops=dict(arrowstyle='->', lw=2.5, color='#333'))
-    ax.annotate('', xy=(6.5, 4.2), xytext=(6.5, 5.0), arrowprops=dict(arrowstyle='->', lw=2.5, color='#333'))
-    ax.annotate('', xy=(6.5, 4.2), xytext=(10.5, 5.0), arrowprops=dict(arrowstyle='->', lw=2.5, color='#333'))
+    ax.annotate('', xy=(6.5, 4.4), xytext=(2.5, 5.0), arrowprops=dict(arrowstyle='->', lw=2.5, color='#333'))
+    ax.annotate('', xy=(6.5, 3.9), xytext=(6.5, 5.0), arrowprops=dict(arrowstyle='->', lw=2.5, color='#333'))
+    ax.annotate('', xy=(6.5, 4.4), xytext=(10.5, 5.0), arrowprops=dict(arrowstyle='->', lw=2.5, color='#333'))
+    
 
-    ax.text(6.5, 4.5, '取交集 ∩', ha='center', fontsize=12, fontweight='bold',
+    ax.text(6.5, 4.4, '∩', ha='center', fontsize=25, fontweight='bold',
             bbox=dict(boxstyle='round,pad=0.3', facecolor='#FFF8DC', edgecolor='#DAA520', linewidth=2))
 
     draw_ellipse(6.5, 3, 3.5, 2, '对齐后\n共同样本', '~150', '#7BAFD4')
 
-    ax.annotate('', xy=(6.5, 1.8), xytext=(6.5, 2.2), arrowprops=dict(arrowstyle='->', lw=2.5, color='#C0392B'))
-    ax.text(9, 2.0, '剔除HER2+\n(n<2)', ha='left', fontsize=11, color='#C0392B', fontweight='bold')
+    ax.annotate('', xy=(6.5, 1.5), xytext=(6.5, 2.3), arrowprops=dict(arrowstyle='->', lw=2.5, color='#333'))
+    ax.text(10, 2.9, '剔除HER2+\n(n<2)', ha='center', fontsize=25, color='#C0392B', fontweight='bold')
 
     draw_ellipse(6.5, 0.9, 3.5, 1.4, '有效样本集\n(建模用)', '142', '#4A9B4A')
 
     info_text = (
-        "对齐规则:\n"
-        "• 三模态样本交集\n"
-        "• 移除缺失样本\n"
-        "• 剔除稀有类别\n"
-        "• 最终: 142样本"
+        "对齐流程:\n"
+        "   三模态样本交集\n"
+        "   移除缺失样本\n"
+        "   剔除稀有类别\n"
+        "   最终: 142样本"
     )
     props = dict(boxstyle='round,pad=0.4', facecolor='#F5F5F5', edgecolor='#999', linewidth=1.5, alpha=0.95)
-    ax.text(0.3, 3.5, info_text, fontsize=11, va='top', bbox=props, fontweight='bold')
+    ax.text(0.3, 3.5, info_text, fontsize=25, va='top', bbox=props, fontweight='bold')
 
     plt.tight_layout()
     output_path = OUTPUT_DIR / 'fig4_sample_alignment.png'
