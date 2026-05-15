@@ -2,7 +2,7 @@
 
 \subsection{方法差异的深层解释与理论视角}
 
-本轮实验结果显示Concat-SVM的均值最高，RNA-only与MOFA紧随其后，Stacking表现最弱。这六种方法形成由浅入深的融合链条：RNA-only提供单组学基线，Meth-only验证甲基化独立分类能力，Concat引入跨模态互补，MOFA在潜空间压缩冗余，Stacking在决策层进一步融合。该排序说明"跨组学互补"已在当前数据上得到验证，但"复杂融合"并不必然带来稳定增益——模型复杂度与性能的关系并非单调递增，而是呈现倒 U 型曲线（见图~\ref{fig:complexity-vs-performance}）。
+本轮实验结果显示Concat-SVM的均值最高，RNA-only与MOFA紧随其后，Stacking表现最弱。这六种方法形成由浅入深的融合链条：RNA-only提供单组学基线，Meth-only验证甲基化独立分类能力，Concat引入跨模态互补，MOFA在潜空间压缩冗余，Stacking在决策层进一步融合。该排序说明"跨组学互补"已在当前数据上得到验证，但"复杂融合"并不必然带来稳定增益——模型复杂度与性能的关系并非单调递增，而是呈现倒U型曲线，见图~\ref{fig:complexity-vs-performance}。
 
 \begin{figure}[H]
 \centering
