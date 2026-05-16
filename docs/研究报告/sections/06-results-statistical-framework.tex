@@ -1,38 +1,13 @@
+
 \section{结果统计框架}
 
-\subsection{评估原则}
+本文在主结果中采用 repeated stratified cross-validation 作为统一评估口径。主实验统一使用 5 折 10 次重复，共 $n=50$ 个测试折，部分敏感性分析实验因配置差异使用 15、25、30 或 75 个测试折。所有结果均报告均值、标准差与 95\% 置信区间，以降低单次切分带来的偶然性，使不同方法的比较建立在更稳定的统计基础上。
 
-本文在主结果中采用 repeated stratified cross-validation 作为统一评估口径。主实验统一使用 5 折 10 次重复（$n=50$ 个测试折），部分敏感性分析实验因配置差异使用 15、25、30 或 75 个测试折。所有结果均报告均值、标准差与 95\% 置信区间，以降低单次切分带来的偶然性，使不同方法的比较建立在更稳定的统计基础上。
+对于每个方法和每个指标，设 fold-level 结果为 $x_1, x_2, \dots, x_n$，则均值为 $\mu = \frac{1}{n} \sum_{i=1}^{n} x_i$，标准差为 $\sigma = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (x_i - \mu)^2}$，95\% 置信区间为 $\mu \pm 1.96 \cdot \frac{\sigma}{\sqrt{n}}$，其中 $n$ 为全部测试折数量，主线实验 $n=50$。
 
-\subsection{统计量定义}
+不同方法的结论采用以下顺序解释，先比较 Accuracy、Balanced Accuracy 与 Macro-F1 的均值，再看 95\% CI 是否明显重叠，最后结合 fold-level 分布判断稳定性。若某方法仅在单次切分上表现更优，但在 repeated CV 下波动较大，则不将其作为主结论依据。
 
-对于每个方法和每个指标，设 fold-level 结果为 $x_1, x_2, \dots, x_n$，则：
-
-\begin{itemize}
-    \item 均值：$\mu = \frac{1}{n} \sum_{i=1}^{n} x_i$
-    \item 标准差：$\sigma = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (x_i - \mu)^2}$
-    \item 95\% CI：$\mu \pm 1.96 \cdot \frac{\sigma}{\sqrt{n}}$
-\end{itemize}
-
-其中 $n$ 为全部测试折数量（主线实验 $n=50$）。
-
-\subsection{比较原则}
-
-不同方法的结论采用以下顺序解释：
-
-\begin{enumerate}
-    \item 先比较 Accuracy、Balanced Accuracy 与 Macro-F1 的均值；
-    \item 再看 95\% CI 是否明显重叠；
-    \item 最后结合 fold-level 分布判断稳定性。
-\end{enumerate}
-
-若某方法仅在单次切分上表现更优，但在 repeated CV 下波动较大，则不将其作为主结论依据。
-
-\subsection{显著性检验说明}
-
-当需要比较相邻方法是否存在稳定差异时，我们采用基于 fold-level 指标的双侧置换检验（20,000 次置换）作为补充分析工具。该检验不依赖正态分布假设，适合小样本、多折结果场景。
-
-\subsection{多指标统计结果}
+当需要比较相邻方法是否存在稳定差异时，我们采用基于 fold-level 指标的双侧置换检验，20,000次置换，作为补充分析工具。该检验不依赖正态分布假设，适合小样本、多折结果场景。
 
 表~\ref{tab:results-main} 展示了六种融合策略在统一评估口径下的性能对比。所有数据均来自实验日志汇总文件，确保正文数值与实验日志完全一致。
 
@@ -43,31 +18,21 @@
 \label{tab:results-main}
 \begin{tabular}{lcccccc}
 \toprule
-方法 & Acc & 95\% CI & Bal-Acc & 95\% CI & Macro-F1 & 95\% CI \\
+方法 &amp; Acc &amp; 95\% CI &amp; Bal-Acc &amp; 95\% CI &amp; Macro-F1 &amp; 95\% CI \\
 \midrule
-RNA-only & 0.8978 & [0.868, 0.927] & 0.8844 & [0.853, 0.916] & 0.8899 & [0.860, 0.920] \\
-Meth-only & 0.8367 & [0.799, 0.874] & 0.8310 & [0.793, 0.869] & 0.8244 & [0.784, 0.864] \\
-Concat-SVM & 0.9064 & [0.878, 0.935] & 0.9056 & [0.872, 0.939] & 0.9003 & [0.867, 0.933] \\
-Concat-XGB & 0.8982 & [0.869, 0.928] & 0.8923 & [0.863, 0.922] & 0.8880 & [0.858, 0.918] \\
-MOFA-20 & 0.9000 & [0.871, 0.929] & 0.8941 & [0.864, 0.924] & 0.8903 & [0.860, 0.921] \\
-Stacking & 0.8556 & [0.826, 0.886] & 0.8479 & [0.816, 0.880] & 0.8479 & [0.815, 0.880] \\
+RNA-only &amp; 0.8978 &amp; [0.868, 0.927] &amp; 0.8844 &amp; [0.853, 0.916] &amp; 0.8899 &amp; [0.860, 0.920] \\
+Meth-only &amp; 0.8367 &amp; [0.799, 0.874] &amp; 0.8310 &amp; [0.793, 0.869] &amp; 0.8244 &amp; [0.784, 0.864] \\
+Concat-SVM &amp; 0.9064 &amp; [0.878, 0.935] &amp; 0.9056 &amp; [0.872, 0.939] &amp; 0.9003 &amp; [0.867, 0.933] \\
+Concat-XGB &amp; 0.8982 &amp; [0.869, 0.928] &amp; 0.8923 &amp; [0.863, 0.922] &amp; 0.8880 &amp; [0.858, 0.918] \\
+MOFA-20 &amp; 0.9000 &amp; [0.871, 0.929] &amp; 0.8941 &amp; [0.864, 0.924] &amp; 0.8903 &amp; [0.860, 0.921] \\
+Stacking &amp; 0.8556 &amp; [0.826, 0.886] &amp; 0.8479 &amp; [0.816, 0.880] &amp; 0.8479 &amp; [0.815, 0.880] \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{数据来源说明}：
-\begin{itemize}
-    \item RNA-only (SVM)：RNA单模态基线实验，$n=50$
-    \item Meth-only (XGB)：甲基化单模态实验，$n=50$
-    \item Concat (SVM)：早期融合主实验，$n=50$
-    \item Concat (XGB)：早期融合对比实验，$n=50$
-    \item MOFA (20 factors)：潜在因子融合主实验，$n=50$
-    \item Stacking (XGB+Logistic)：堆叠集成主实验，$n=50$
-\end{itemize}
+数据来源说明包括RNA-only SVM为RNA单模态基线实验，$n=50$，Meth-only XGB为甲基化单模态实验，$n=50$，Concat SVM为早期融合主实验，$n=50$，Concat XGB为早期融合对比实验，$n=50$，MOFA 20 factors为潜在因子融合主实验，$n=50$，Stacking XGB+Logistic为堆叠集成主实验，$n=50$。
 
-从均值排序为：Concat-SVM > MOFA > Concat-XGB $\approx$ RNA-only > Meth-only > Stacking。Concat-SVM 在三项核心指标上均表现最优（Accuracy=90.64\%，Macro-F1=90.03\%），而 Stacking 方法反而表现最弱（Accuracy=85.56\%），提示在当前样本规模下增加融合层级并未带来稳定增益。
-
-\subsection{多指标置换检验}
+从均值排序为Concat-SVM > MOFA > Concat-XGB $\approx$ RNA-only > Meth-only > Stacking。Concat-SVM 在三项核心指标上均表现最优，Accuracy为90.64\%，Macro-F1为90.03\%，而 Stacking 方法反而表现最弱，Accuracy为85.56\%，提示在当前样本规模下增加融合层级并未带来稳定增益。
 
 \begin{table}[H]
 \centering
@@ -75,24 +40,19 @@ Stacking & 0.8556 & [0.826, 0.886] & 0.8479 & [0.816, 0.880] & 0.8479 & [0.815, 
 \label{tab:permtest-all}
 \begin{tabular}{lccc}
 \toprule
-方法对比 & |$\Delta$Accuracy| & |$\Delta$BalancedAcc| & |$\Delta$MacroF1| \\
+方法对比 &amp; |$\Delta$Accuracy| &amp; |$\Delta$BalancedAcc| &amp; |$\Delta$MacroF1| \\
 \midrule
-RNA vs Concat-SVM & 0.0086 & 0.0212 & 0.0104 \\
-RNA vs MOFA & 0.0022 & 0.0097 & 0.0004 \\
-RNA vs Meth & 0.0611 & 0.0534 & 0.0655 \\
-Concat vs MOFA & 0.0064 & 0.0115 & 0.0100 \\
-Concat vs Stacking & 0.0508 & 0.0577 & 0.0524 \\
-MOFA vs Stacking & 0.0444 & 0.0462 & 0.0424 \\
+RNA vs Concat-SVM &amp; 0.0086 &amp; 0.0212 &amp; 0.0104 \\
+RNA vs MOFA &amp; 0.0022 &amp; 0.0097 &amp; 0.0004 \\
+RNA vs Meth &amp; 0.0611 &amp; 0.0534 &amp; 0.0655 \\
+Concat vs MOFA &amp; 0.0064 &amp; 0.0115 &amp; 0.0100 \\
+Concat vs Stacking &amp; 0.0508 &amp; 0.0577 &amp; 0.0524 \\
+MOFA vs Stacking &amp; 0.0444 &amp; 0.0462 &amp; 0.0424 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-从当前样本规模看，Concat 与 RNA-only/MOFA 的均值差距较小（$<$2.3\%），而与 Stacking 的差距较大（$>$5\%）。Meth-only 与其他方法存在明显性能落差（$>$5\%），表明甲基化单模态信息量不足以独立完成高精度分类任务。
+从当前样本规模看，Concat 与 RNA-only/MOFA 的均值差距较小，小于2.3\%，而与 Stacking 的差距较大，大于5\%。Meth-only 与其他方法存在明显性能落差，大于5\%，表明甲基化单模态信息量不足以独立完成高精度分类任务。
 
-\subsection{理论分析}
+从统计学习理论角度，Concat-SVM 的最优性能可从偏差-方差权衡角度解释。设模型的期望泛化误差可分解为期望平方误差等于偏差平方加方差加噪声平方，其中偏差平方为偏差平方，方差为方差，噪声平方为不可约误差。在小样本高维场景下，复杂模型如 Stacking 虽然偏差较低，但方差显著增大，导致总体误差上升。而简单模型如 Concat-SVM 通过限制模型复杂度，实现了更优的偏差-方差权衡。
 
-从统计学习理论角度，Concat-SVM 的最优性能可从偏差-方差权衡（Bias-Variance Tradeoff）角度解释。设模型的期望泛化误差可分解为：
-\[
-\mathbb{E}[(y - \hat{f}(x))^2] = \mathrm{Bias}^2(\hat{f}) + \mathrm{Var}(\hat{f}) + \sigma^2
-\]
-其中 $\mathrm{Bias}^2$ 为偏差平方，$\mathrm{Var}$ 为方差，$\sigma^2$ 为不可约误差。在小样本高维场景下，复杂模型（如 Stacking）虽然偏差较低，但方差显著增大，导致总体误差上升；而简单模型（如 Concat-SVM）通过限制模型复杂度，实现了更优的偏差-方差权衡。
