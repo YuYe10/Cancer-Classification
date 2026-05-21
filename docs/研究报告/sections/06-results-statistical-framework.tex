@@ -1,7 +1,7 @@
 
 \section{结果统计框架}
 
-本文在主结果中采用 repeated stratified cross-validation 作为统一评估口径。主实验统一使用 5 折 10 次重复，共 $n=50$ 个测试折，部分敏感性分析实验因配置差异使用 15、25、30 或 75 个测试折。所有结果均报告均值、标准差与 95\% 置信区间，以降低单次切分带来的偶然性，使不同方法的比较建立在更稳定的统计基础上。
+本文在主结果中采用重复分层交叉验证作为统一评估口径。主实验统一使用 5 折 10 次重复，共 $n=50$ 个测试折，部分敏感性分析实验因配置差异使用 15、25、30 或 75 个测试折。所有结果均报告均值、标准差与 95\% 置信区间，以降低单次切分带来的偶然性，使不同方法的比较建立在更稳定的统计基础上。
 
 对于每个方法和每个指标，设 fold-level 结果为 $x_1, x_2, \dots, x_n$，则均值为 $\mu = \frac{1}{n} \sum_{i=1}^{n} x_i$，标准差为 $\sigma = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (x_i - \mu)^2}$，95\% 置信区间为 $\mu \pm 1.96 \cdot \frac{\sigma}{\sqrt{n}}$，其中 $n$ 为全部测试折数量，主线实验 $n=50$。
 
@@ -14,18 +14,18 @@
 \begin{table}[H]
 \centering
 \small
-\caption{六种融合策略性能对比（主线实验，$n=50$）}
+\caption{六种融合策略性能对比}
 \label{tab:results-main}
 \begin{tabular}{lcccccc}
 \toprule
-方法 &amp; Acc &amp; 95\% CI &amp; Bal-Acc &amp; 95\% CI &amp; Macro-F1 &amp; 95\% CI \\
+方法 & Acc & 95\% CI & Bal-Acc & 95\% CI & Macro-F1 & 95\% CI \\
 \midrule
-RNA-only &amp; 0.8978 &amp; [0.868, 0.927] &amp; 0.8844 &amp; [0.853, 0.916] &amp; 0.8899 &amp; [0.860, 0.920] \\
-Meth-only &amp; 0.8367 &amp; [0.799, 0.874] &amp; 0.8310 &amp; [0.793, 0.869] &amp; 0.8244 &amp; [0.784, 0.864] \\
-Concat-SVM &amp; 0.9064 &amp; [0.878, 0.935] &amp; 0.9056 &amp; [0.872, 0.939] &amp; 0.9003 &amp; [0.867, 0.933] \\
-Concat-XGB &amp; 0.8982 &amp; [0.869, 0.928] &amp; 0.8923 &amp; [0.863, 0.922] &amp; 0.8880 &amp; [0.858, 0.918] \\
-MOFA-20 &amp; 0.9000 &amp; [0.871, 0.929] &amp; 0.8941 &amp; [0.864, 0.924] &amp; 0.8903 &amp; [0.860, 0.921] \\
-Stacking &amp; 0.8556 &amp; [0.826, 0.886] &amp; 0.8479 &amp; [0.816, 0.880] &amp; 0.8479 &amp; [0.815, 0.880] \\
+RNA-only & 0.8978 & [0.868, 0.927] & 0.8844 & [0.853, 0.916] & 0.8899 & [0.860, 0.920] \\
+Meth-only & 0.8367 & [0.799, 0.874] & 0.8310 & [0.793, 0.869] & 0.8244 & [0.784, 0.864] \\
+Concat-SVM & 0.9064 & [0.878, 0.935] & 0.9056 & [0.872, 0.939] & 0.9003 & [0.867, 0.933] \\
+Concat-XGB & 0.8982 & [0.869, 0.928] & 0.8923 & [0.863, 0.922] & 0.8880 & [0.858, 0.918] \\
+MOFA-20 & 0.9000 & [0.871, 0.929] & 0.8941 & [0.864, 0.924] & 0.8903 & [0.860, 0.921] \\
+Stacking & 0.8556 & [0.826, 0.886] & 0.8479 & [0.816, 0.880] & 0.8479 & [0.815, 0.880] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -40,14 +40,14 @@ Stacking &amp; 0.8556 &amp; [0.826, 0.886] &amp; 0.8479 &amp; [0.816, 0.880] &am
 \label{tab:permtest-all}
 \begin{tabular}{lccc}
 \toprule
-方法对比 &amp; |$\Delta$Accuracy| &amp; |$\Delta$BalancedAcc| &amp; |$\Delta$MacroF1| \\
+方法对比 & |$\Delta$Accuracy| & |$\Delta$BalancedAcc| & |$\Delta$MacroF1| \\
 \midrule
-RNA vs Concat-SVM &amp; 0.0086 &amp; 0.0212 &amp; 0.0104 \\
-RNA vs MOFA &amp; 0.0022 &amp; 0.0097 &amp; 0.0004 \\
-RNA vs Meth &amp; 0.0611 &amp; 0.0534 &amp; 0.0655 \\
-Concat vs MOFA &amp; 0.0064 &amp; 0.0115 &amp; 0.0100 \\
-Concat vs Stacking &amp; 0.0508 &amp; 0.0577 &amp; 0.0524 \\
-MOFA vs Stacking &amp; 0.0444 &amp; 0.0462 &amp; 0.0424 \\
+RNA vs Concat-SVM & 0.0086 & 0.0212 & 0.0104 \\
+RNA vs MOFA & 0.0022 & 0.0097 & 0.0004 \\
+RNA vs Meth & 0.0611 & 0.0534 & 0.0655 \\
+Concat vs MOFA & 0.0064 & 0.0115 & 0.0100 \\
+Concat vs Stacking & 0.0508 & 0.0577 & 0.0524 \\
+MOFA vs Stacking & 0.0444 & 0.0462 & 0.0424 \\
 \bottomrule
 \end{tabular}
 \end{table}

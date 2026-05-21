@@ -1,6 +1,6 @@
 \section{方法}
 
-本文统一使用以下数学符号与变量定义，所有符号均在后续公式推导与算法描述中保持一致，确保理论描述与工程实现的可追溯性。
+本文统一使用以下数学符号与变量定义。
 
 \begin{table}[H]
 \centering
@@ -12,21 +12,21 @@
 \midrule
 $X^{(r)}$ & RNA-seq 表达矩阵，维度 $p_r \times n$ \\
 $X^{(m)}$ & DNA 甲基化矩阵，维度 $p_m \times n$ \\
-$Z^{(r)}, Z^{(m)}$ & 预处理后 RNA / 甲基化特征矩阵 \\
+$Z^{(r)}, Z^{(m)}$ & 预处理后 RNA / DNA甲基化特征矩阵 \\
 $Z^{(c)}$ & Concat 融合后的拼接特征矩阵 \\
-$W$ & MOFA 潜变量矩阵（因子得分） \\
-$A^{(r)}, A^{(m)}$ & MOFA 权重矩阵（因子载荷） \\
+$W$ & MOFA 潜变量矩阵 \\
+$A^{(r)}, A^{(m)}$ & MOFA 权重矩阵 \\
 $q$ & MOFA 潜在因子数 \\
-$H$ & Stacking 元特征矩阵（OOF 概率拼接） \\
+$H$ & Stacking 元特征矩阵 \\
 $n$ & 样本总数 \\
 $p$ & 特征维度总数 \\
 $K$ & 高方差特征筛选后保留的特征数 \\
 $k$ & 类别索引（$k=1,2,\dots,C$） \\
-$C$ & 类别总数（本文中 $C=3$） \\
+$C$ & 类别总数（$C=3$） \\
 $\mu, \sigma$ & 均值、标准差 \\
 $\mathrm{CI}_{95}$ & 95\% 置信区间 \\
-$\mathrm{Acc}$ & 准确率（Accuracy） \\
-$\mathrm{Bal\_Acc}$ & 平衡准确率（Balanced Accuracy） \\
+$\mathrm{Acc}$ & 准确率 \\
+$\mathrm{Bal\_Acc}$ & 平衡准确率 \\
 $\mathrm{F1}$ & F1 分数 \\
 $\mathrm{Macro\text{-}F1}$ & 宏平均 F1 分数 \\
 $\mathrm{TP}_k, \mathrm{FP}_k, \mathrm{FN}_k$ & 第 $k$ 类的真阳性、假阳性、假阴性 \\
@@ -37,12 +37,12 @@ $\mathbf{w}, b$ & SVM 权重向量与偏置项 \\
 $\xi_i$ & SVM 松弛变量 \\
 $\phi(\cdot)$ & 核映射函数 \\
 $\mathrm{Var}(x_j)$ & 第 $j$ 个特征的样本方差 \\
-$\hat{P}^{oof}$ & Out-of-fold 概率预测 \\
+$\hat{P}^{oof}$ & 折外概率预测 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-本文采用统一的配置驱动流程，对六种分类方法进行同口径比较：RNA-only、Meth-only、Concat、MOFA、Stacking及其变体。四种核心融合策略的架构分别如图~\ref{fig:rna-only}、\ref{fig:concat}、\ref{fig:mofa}、\ref{fig:stacking}所示，实验管道总览见图~\ref{fig:method-pipeline-overview}。实验流水线由同一入口调度，包含以下关键步骤：首先从RNA表达矩阵、甲基化矩阵、临床标签三个数据源读取数据，通过样本标识符进行三方对齐，确保每个组学矩阵和标签对应同一批样本；接着将PAM50标签数值化，统计各类别样本数，若某类别样本数低于阈值2，则在后续处理中自动剔除该类别并记录；然后在每个外层交叉验证折内，先完成训练/测试划分，再仅用训练折数据完成特征筛选与标准化拟合，最后将同一预处理器应用到测试折；之后根据配置选择融合策略RNA-only、Concat、MOFA或Stacking，在训练折上完成模型训练；使用训练阶段拟合的预处理器和模型对测试折进行独立预测，收集各项分类指标；最后收集所有测试折的指标，计算均值、标准差与95\%置信区间。该流程的核心约束是所有可学习步骤均在训练折内完成，测试折仅用于独立推断与评估。这一设计通过预处理器模块的拟合与变换接口实现，确保预处理参数仅从训练数据估计，避免信息泄露。
+本文采用统一的配置驱动流程，对不同分类方法进行同口径比较。四种核心融合策略的架构分别如图~\ref{fig:rna-only}、\ref{fig:concat}、\ref{fig:mofa}、\ref{fig:stacking}所示，实验管道总览见图~\ref{fig:method-pipeline-overview}。实验流水线由同一入口调度，包含以下关键步骤。首先从RNA表达矩阵、甲基化矩阵、临床标签三个数据源读取数据，通过样本标识符进行三方对齐，确保每个组学矩阵和标签对应同一批样本；接着将PAM50标签数值化，统计各类别样本数，若某类别样本数低于阈值2，则在后续处理中自动剔除该类别并记录；然后在每个外层交叉验证折内，先完成训练/测试划分，再仅用训练折数据完成特征筛选与标准化拟合，最后将同一预处理器应用到测试折；之后根据配置选择融合策略RNA-only、Concat、MOFA或Stacking，在训练折上完成模型训练；使用训练阶段拟合的预处理器和模型对测试折进行独立预测，收集各项分类指标；最后收集所有测试折的指标，计算均值、标准差与95\%置信区间。该流程的核心约束是所有可学习步骤均在训练折内完成，测试折仅用于独立推断与评估。这一设计通过预处理器模块的拟合与变换接口实现，确保预处理参数仅从训练数据估计，避免信息泄露。
 
 \subsection{数据预处理与特征工程}
 
@@ -90,7 +90,7 @@ Z_{ij} = \frac{\tilde{X}_{ij} - \mu_j}{\sigma_j},
 
 \subsubsection{融合方法架构对比}
 
-本文采用四种代表性的多组学融合策略进行系统性比较，每种方法代表不同的融合范式：
+本文采用四种代表性的多组学融合策略进行系统性比较，每种方法架构图如下：
 
 \begin{figure}[H]
 \centering
@@ -125,13 +125,13 @@ Z_{ij} = \frac{\tilde{X}_{ij} - \mu_j}{\sigma_j},
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\linewidth]{../../outputs/figures/chapter3/fig2.png}
-\caption{融合方法实验管道总览。展示从数据读取、样本对齐、训练-测试划分到各融合分支训练的完整流程。所有可学习步骤（特征筛选、标准化、MOFA 拟合、Stacking 元特征构造）均限定在训练折内完成，测试折仅用于独立推断，严格遵循防泄露原则。}
+\caption{融合方法实验管道总览。展示从数据读取、样本对齐、训练-测试划分到各融合分支训练的完整流程。所有可学习步骤均限定在训练折内完成，测试折仅用于独立推断，严格遵循防泄露原则。}
 \label{fig:method-pipeline-overview}
 \end{figure}
 
 \subsubsection{RNA-only 单模态基线}
 
-RNA-only 使用表达组学作为单模态基线，用于回答"仅靠 RNA 能达到什么水平"。该分支是后续融合收益评估的参照系。在预处理阶段，RNA数据经过对数变换、均值过滤、方差筛选和z-score标准化后，直接输入分类器进行训练与预测。
+RNA-only 使用表达组学作为单模态基线。该分支是后续融合收益评估的参照系。在预处理阶段，RNA数据经过对数变换、均值过滤、方差筛选和z-score标准化后，直接输入分类器进行训练与预测。
 
 \subsubsection{Concat 早期融合}
 
@@ -155,7 +155,7 @@ Z^{(c)} = [Z^{(r)} \;\Vert\; Z^{(m)}] \in \mathbb{R}^{n \times (d_r + d_m)}.
 
 \subsubsection{MOFA 潜在因子融合}
 
-MOFA 先从多视图数据学习低维潜因子，再将潜因子送入分类器。与直接拼接相比，MOFA 能在潜空间中压缩冗余与噪声。对于两个组学视图，MOFA 可抽象为寻找一个低维潜变量矩阵 $W \in \mathbb{R}^{n \times q}$，使得每个组学数据都可以由该潜变量和对应权重矩阵近似重构：
+MOFA~\cite{mofa2018} 先从多视图数据学习低维潜因子，再将潜因子送入分类器。与直接拼接相比，MOFA 能在潜空间中压缩冗余与噪声。对于两个组学视图，MOFA 可抽象为寻找一个低维潜变量矩阵 $W \in \mathbb{R}^{n \times q}$，使得每个组学数据都可以由该潜变量和对应权重矩阵近似重构：
 \[
 Z^{(r)} \approx W A^{(r)\top}, \qquad Z^{(m)} \approx W A^{(m)\top},
 \]
@@ -191,7 +191,7 @@ Z_{test}=X_{test}W(W^\top W+\lambda I)^{-1}W^\top
 
 Stacking 在 RNA 与甲基化分支分别训练基模型，使用训练折上的 out-of-fold 概率作为元特征，再训练元分类器输出最终预测。该策略通过分支级决策边界融合提升泛化能力。
 
-为避免元分类器看到"同一折训练得到的乐观预测"，我们在每个外层训练折内使用内层交叉验证构造 OOF 概率，记为 $\hat{P}_{rna}^{oof}$ 与 $\hat{P}_{meth}^{oof}$，再拼接为
+我们在每个外层训练折内使用内层交叉验证构造 OOF 概率，记为 $\hat{P}_{rna}^{oof}$ 与 $\hat{P}_{meth}^{oof}$，再拼接为
 \[
 H=[\hat{P}_{rna}^{oof};\hat{P}_{meth}^{oof}]
 \]
@@ -226,7 +226,7 @@ Stacking 的元特征维度为 $H \in \mathbb{R}^{n \times (C \cdot V)}$，其�
 
 \subsection{SVM 分类器与优化目标}
 
-本文采用支持向量机作为统一分类器。对于二分类情况，SVM 的目标函数可写为：
+本文采用支持向量机~\cite{svm1995}作为统一分类器。对于二分类情况，SVM 的目标函数可写为：
 \[
 \min_{\mathbf{w}, b, \xi} \; \frac{1}{2}\|\mathbf{w}\|^2 + C \sum_{i=1}^{n} \xi_i
 \]
@@ -282,13 +282,3 @@ Stacking 的元特征维度为 $H \in \mathbb{R}^{n \times (C \cdot V)}$，其�
 \end{enumerate}
 
 由此可将性能差异主要归因于方法机制差异，而非评估口径差异。此外，所有实验配置通过结构化配置文件管理，随机种子固定，确保结果可复现。
-
-\subsection{本研究的创新点定位}
-
-本研究不将贡献定位为"新算法发明"，而是定位为可审计的研究设计创新与实证创新：
-
-\begin{enumerate}
-    \item \textbf{严格防泄露的统一评估协议}：将特征筛选、标准化、MOFA 拟合/投影、Stacking 元特征构造全部约束在训练折，保证四方法在同一公平口径比较；
-    \item \textbf{融合深度递进实证链条}：在单癌种 BRCA 场景下构建 RNA-only $\rightarrow$ Concat $\rightarrow$ MOFA $\rightarrow$ Stacking 的递进对比，直接回答"融合是否带来稳定增益"；
-    \item \textbf{可复现实验交付}：实验配置、批处理脚本、统计检验与图表导出形成闭环，确保报告结论可被复算与复查。
-\end{enumerate}

@@ -17,10 +17,9 @@
 \contentsline {subsection}{\numberline {4.3}SVM 分类器与优化目标}{22}{subsection.4.3}%
 \contentsline {subsection}{\numberline {4.4}分类评价指标}{23}{subsection.4.4}%
 \contentsline {subsection}{\numberline {4.5}偏倚控制与可复现性}{23}{subsection.4.5}%
-\contentsline {subsection}{\numberline {4.6}本研究的创新点定位}{24}{subsection.4.6}%
 \contentsline {section}{\numberline {5}实验设置}{24}{section.5}%
-\contentsline {section}{\numberline {6}结果统计框架}{27}{section.6}%
-\contentsline {section}{\numberline {7}结果与可视化分析}{29}{section.7}%
-\contentsline {section}{\numberline {8}讨论}{35}{section.8}%
-\contentsline {section}{\numberline {9}结论}{39}{section.9}%
-\contentsline {section}{\numberline {10}参考文献}{41}{section.10}%
+\contentsline {section}{\numberline {6}结果统计框架}{26}{section.6}%
+\contentsline {section}{\numberline {7}可视化分析}{27}{section.7}%
+\contentsline {section}{\numberline {8}讨论}{33}{section.8}%
+\contentsline {section}{\numberline {9}结论}{37}{section.9}%
+\contentsline {section}{\numberline {10}参考文献}{39}{section.10}%
